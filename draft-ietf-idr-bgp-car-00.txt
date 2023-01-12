@@ -5,9 +5,9 @@
 IDR WorkGroup                                                D. Rao, Ed.
 Internet-Draft                                           S. Agrawal, Ed.
 Intended status: Experimental                              Cisco Systems
-Expires: 27 February 2023                                     Co-authors
+Expires: 8 July 2023                                          Co-authors
                                                               section 11
-                                                          26 August 2022
+                                                          4 January 2023
 
 
                      BGP Color-Aware Routing (CAR)
@@ -35,11 +35,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 February 2023.
+   This Internet-Draft will expire on 8 July 2023.
 
 Copyright Notice
 
-   Copyright (c) 2022 IETF Trust and the persons identified as the
+   Copyright (c) 2023 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Rao, et al.             Expires 27 February 2023                [Page 1]
+Rao, et al.                Expires 8 July 2023                  [Page 1]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
 Table of Contents
@@ -74,171 +74,177 @@ Table of Contents
      2.7.  Path Availability . . . . . . . . . . . . . . . . . . . .  10
      2.8.  BGP CAR signaling through different color domains . . . .  10
      2.9.  Format and Encoding . . . . . . . . . . . . . . . . . . .  11
-       2.9.1.  BGP CAR SAFI NLRI Format  . . . . . . . . . . . . . .  11
-       2.9.2.  Color-Aware Routes NLRI Type  . . . . . . . . . . . .  12
+       2.9.1.  BGP CAR SAFI NLRI Format  . . . . . . . . . . . . . .  12
+       2.9.2.  Color-Aware Routes NLRI Type  . . . . . . . . . . . .  13
        2.9.3.  Local-Color-Mapping (LCM) Extended Community  . . . .  17
-     2.10. Error Handling  . . . . . . . . . . . . . . . . . . . . .  18
-   3.  Service route Automated Steering on Color-Aware path  . . . .  19
-   4.  Intents . . . . . . . . . . . . . . . . . . . . . . . . . . .  20
-   5.  (E, C) Subscription and Filtering . . . . . . . . . . . . . .  20
-     5.1.  Illustration  . . . . . . . . . . . . . . . . . . . . . .  20
-     5.2.  Definition  . . . . . . . . . . . . . . . . . . . . . . .  21
-   6.  Scaling . . . . . . . . . . . . . . . . . . . . . . . . . . .  21
-     6.1.  Ultra-Scale Reference Topology  . . . . . . . . . . . . .  21
-     6.2.  Deployment model  . . . . . . . . . . . . . . . . . . . .  23
-       6.2.1.  Flat  . . . . . . . . . . . . . . . . . . . . . . . .  23
+     2.10. LCM and BGP Color Extended Community usage  . . . . . . .  18
+     2.11. Error Handling  . . . . . . . . . . . . . . . . . . . . .  19
+   3.  Service route Automated Steering on Color-Aware path  . . . .  20
+   4.  Intents . . . . . . . . . . . . . . . . . . . . . . . . . . .  21
+   5.  (E, C) Subscription and Filtering . . . . . . . . . . . . . .  21
+     5.1.  Illustration  . . . . . . . . . . . . . . . . . . . . . .  21
+     5.2.  Definition  . . . . . . . . . . . . . . . . . . . . . . .  22
+   6.  Scaling . . . . . . . . . . . . . . . . . . . . . . . . . . .  22
+     6.1.  Ultra-Scale Reference Topology  . . . . . . . . . . . . .  22
+     6.2.  Deployment model  . . . . . . . . . . . . . . . . . . . .  24
+       6.2.1.  Flat  . . . . . . . . . . . . . . . . . . . . . . . .  24
        6.2.2.  Hierarchical Design with next-hop-self at ingress
-               domain BR . . . . . . . . . . . . . . . . . . . . . .  24
+               domain BR . . . . . . . . . . . . . . . . . . . . . .  25
        6.2.3.  Hierarchical Design with Next Hop Unchanged at ingress
-               domain BR . . . . . . . . . . . . . . . . . . . . . .  26
-     6.3.  Scale Analysis  . . . . . . . . . . . . . . . . . . . . .  27
+               domain BR . . . . . . . . . . . . . . . . . . . . . .  27
+     6.3.  Scale Analysis  . . . . . . . . . . . . . . . . . . . . .  28
      6.4.  Scaling Benefits of the (E, C) BGP Subscription and
-           Filtering . . . . . . . . . . . . . . . . . . . . . . . .  29
-     6.5.  Anycast SID . . . . . . . . . . . . . . . . . . . . . . .  29
-       6.5.1.  Anycast SID for transit inter-domain nodes  . . . . .  29
+           Filtering . . . . . . . . . . . . . . . . . . . . . . . .  30
+     6.5.  Anycast SID . . . . . . . . . . . . . . . . . . . . . . .  30
+       6.5.1.  Anycast SID for transit inter-domain nodes  . . . . .  30
        6.5.2.  Anycast SID for transport color endpoints (e.g.,
-               PEs)  . . . . . . . . . . . . . . . . . . . . . . . .  30
-   7.  Routing Convergence . . . . . . . . . . . . . . . . . . . . .  30
-   8.  VPN CAR . . . . . . . . . . . . . . . . . . . . . . . . . . .  30
-   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  32
-     9.1.  BGP CAR NLRI Types Registry . . . . . . . . . . . . . . .  32
-     9.2.  BGP CAR NLRI TLV Registry . . . . . . . . . . . . . . . .  32
-     9.3.  Guidance for Designated Experts . . . . . . . . . . . . .  33
-     9.4.  BGP Extended Community Registry . . . . . . . . . . . . .  33
-   10. Manageability Considerations  . . . . . . . . . . . . . . . .  33
+               PEs)  . . . . . . . . . . . . . . . . . . . . . . . .  31
+   7.  Routing Convergence . . . . . . . . . . . . . . . . . . . . .  31
+   8.  VPN CAR . . . . . . . . . . . . . . . . . . . . . . . . . . .  31
+   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  33
+     9.1.  BGP CAR NLRI Types Registry . . . . . . . . . . . . . . .  33
+     9.2.  BGP CAR NLRI TLV Registry . . . . . . . . . . . . . . . .  33
+     9.3.  Guidance for Designated Experts . . . . . . . . . . . . .  34
+     9.4.  BGP Extended Community Registry . . . . . . . . . . . . .  34
 
 
 
-Rao, et al.             Expires 27 February 2023                [Page 2]
+Rao, et al.                Expires 8 July 2023                  [Page 2]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
-   11. Co-authors  . . . . . . . . . . . . . . . . . . . . . . . . .  33
-   12. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  34
-   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  35
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  35
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  35
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  37
-   Appendix A.  Illustrations of Service Steering  . . . . . . . . .  38
+   10. Manageability Considerations  . . . . . . . . . . . . . . . .  34
+   11. Co-authors  . . . . . . . . . . . . . . . . . . . . . . . . .  34
+   12. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  35
+   13. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  36
+   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  36
+     14.1.  Normative References . . . . . . . . . . . . . . . . . .  36
+     14.2.  Informative References . . . . . . . . . . . . . . . . .  38
+   Appendix A.  Illustrations of Service Steering  . . . . . . . . .  39
      A.1.  E2E BGP transport CAR intent realized using IGP
-           FlexAlgo  . . . . . . . . . . . . . . . . . . . . . . . .  38
-     A.2.  E2E BGP transport CAR intent realized using SR Policy . .  40
+           FlexAlgo  . . . . . . . . . . . . . . . . . . . . . . . .  39
+     A.2.  E2E BGP transport CAR intent realized using SR Policy . .  41
      A.3.  BGP transport CAR intent realized in a section of the
-           network . . . . . . . . . . . . . . . . . . . . . . . . .  42
+           network . . . . . . . . . . . . . . . . . . . . . . . . .  43
        A.3.1.  Provide intent for service flows only in core domain
-               running ISIS FlexAlgo . . . . . . . . . . . . . . . .  42
+               running ISIS FlexAlgo . . . . . . . . . . . . . . . .  43
        A.3.2.  Provide intent for service flows only in core domain
-               over TE tunnel mesh . . . . . . . . . . . . . . . . .  44
-     A.4.  Transit network domains that do not support CAR . . . . .  46
-     A.5.  Resource Avoidance using BGP CAR and IGP Flex-Algo  . . .  47
-     A.6.  Per-Flow Steering over CAR routes . . . . . . . . . . . .  49
-     A.7.  Advertising BGP CAR routes for shared IP addresses  . . .  50
-   Appendix B.  Color Mapping Illustrations  . . . . . . . . . . . .  51
+               over TE tunnel mesh . . . . . . . . . . . . . . . . .  45
+     A.4.  Transit network domains that do not support CAR . . . . .  47
+     A.5.  Resource Avoidance using BGP CAR and IGP Flex-Algo  . . .  48
+     A.6.  Per-Flow Steering over CAR routes . . . . . . . . . . . .  50
+     A.7.  Advertising BGP CAR routes for shared IP addresses  . . .  51
+   Appendix B.  Color Mapping Illustrations  . . . . . . . . . . . .  52
      B.1.  Single color domain containing network domains with N:N
-           color distribution  . . . . . . . . . . . . . . . . . . .  51
-     B.2.  Single color domain containing network domains with N:M
            color distribution  . . . . . . . . . . . . . . . . . . .  52
-     B.3.  Multiple color domains  . . . . . . . . . . . . . . . . .  52
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  53
+     B.2.  Single color domain containing network domains with N:M
+           color distribution  . . . . . . . . . . . . . . . . . . .  53
+     B.3.  Multiple color domains  . . . . . . . . . . . . . . . . .  53
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  54
 
 1.  Introduction
 
    This document specifies a new BGP SAFI called BGP Color-Aware Routing
    (BGP CAR).  BGP CAR fulfills the transport and VPN problem statement
-   and requirements described in [dskc-bess-bgp-car-problem-statement].
+   and requirements described in [draft-hr-spring-intentaware-routing-using-color] 
+   and [dskc-bess-bgp-car-problem-statement].
 
 1.1.  Terminology
 
-   +=============+====================================================+
-   +=============+====================================================+
-   | Intent      | Any combination of the following behaviors: a/     |
-   |             | Topology path selection (e.g. minimize metric,     |
-   |             | avoid resource), b/ NFV service insertion (e.g.    |
-   |             | service chain steering), c/ per-hop behavior (e.g. |
-   |             | 5G slice).                                         |
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   | Color       | A 32-bit numerical value associated with an        |
-   |             | intent: e.g. low-cost vs low-delay vs avoiding     |
-   |             | some resources.                                    |
+       +=============+=============================================+
+       +=============+=============================================+
+       | Intent      | Any combination of the following behaviors: |
+       |             | a/ Topology path selection (e.g. minimize   |
+       |             | metric, avoid resource), b/ NFV service     |
+       |             | insertion (e.g. service chain steering), c/ |
+       |             | per-hop behavior (e.g. 5G slice).           |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       | Color       | A 32-bit numerical value associated with an |
 
 
 
-Rao, et al.             Expires 27 February 2023                [Page 3]
+Rao, et al.                Expires 8 July 2023                  [Page 3]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   | Colored     | An egress PE E2 colors its BGP VPN route V/v to    |
-   | Service     | indicate the intent that it requests for the       |
-   | Route       | traffic bound to V/v.  The color is encoded as a   |
-   |             | BGP Color Extended community                       |
-   |             | [I-D.ietf-idr-tunnel-encaps].                      |
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   | Color-Aware | A routed path to E2 which satisfies the intent     |
-   | Path to     | associated with color C.  Several technologies may |
-   | (E2, C)     | provide a Color-Aware Path to (E2, C): SR Policy   |
-   |             | [I-D.ietf-spring-segment-routing-policy], IGP      |
-   |             | Flex-Algo [I-D.ietf-lsr-flex-algo], BGP CAR        |
-   |             | [specified in this document].                      |
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   | Color-Aware | A distributed or signaled route that builds a      |
-   | Route (E2,  | color-aware path to E2 for color C.                |
-   | C)          |                                                    |
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   | Service     | E1 automatically steers a C-colored service route  |
-   | Route       | V/v from E2 onto an (E2, C) path.  If several such |
-   | Automated   | paths exist, a preference scheme is used to select |
-   | Steering on | the best path: E.g.  IGP Flex-Algo first then BGP  |
-   | Color-aware | CAR then SR Policy.                                |
-   | path        |                                                    |
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   | Color       | A set of nodes which share the same Color-to-      |
-   | Domain      | Intent mapping.  This set can be organized in one  |
-   |             | or several IGP instances or BGP domains.           |
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   | Resolution  | An inter-domain BGP CAR route (E, C) from N is     |
-   | of a BGP    | resolved on an intra-domain color-aware path (N,   |
-   | CAR route   | C) where N is the next-hop of the BGP CAR route.   |
-   | (E, C)      |                                                    |
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   | Resolution  | In this document and consistently with the         |
-   | vs Steering | terminology of the SR Policy document              |
-   |             | [I-D.ietf-spring-segment-routing-policy], steering |
-   |             | is used to describe the mapping of a service route |
-   |             | onto a BGP CAR path while the term resolution is   |
-   |             | preserved for the mapping of an inter-domain BGP   |
-   |             | CAR route on an intra-domain color-aware path.     |
+       |             | intent: e.g. low-cost vs low-delay vs       |
+       |             | avoiding some resources. As defined in RFC9256|
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       | Colored     | An egress PE E2 colors its BGP VPN route V/ |
+       | Service     | v to indicate the intent that it requests   |
+       | Route       | for the traffic bound to V/v.  The color is |
+       |             | encoded as a BGP Color Extended community   |
+       |             | [RFC9012].                                  |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       | Color-Aware | A routed path to E2 which satisfies the     |
+       | Path to     | intent associated with color C.  Several    |
+       | (E2, C)     | technologies may provide a Color-Aware Path |
+       |             | to (E2, C): SR Policy [RFC9256], IGP Flex-  |
+       |             | Algo [I-D.ietf-lsr-flex-algo], BGP CAR      |
+       |             | [specified in this document].               |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       | Color-Aware | A distributed or signaled route that builds |
+       | Route (E2,  | a color-aware path to E2 for color C.       |
+       | C)          |                                             |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       | Service     | E1 automatically steers a C-colored service |
+       | Route       | route V/v from E2 onto an (E2, C) path.  If |
+       | Automated   | several such paths exist, a preference      |
+       | Steering on | scheme is used to select the best path:     |
+       | Color-aware | E.g.  IGP Flex-Algo first then BGP CAR then |
+       | path        | SR Policy.                                  |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       | Color       | A set of nodes which share the same Color-  |
+       | Domain      | to-Intent mapping.  This set can be         |
+       |             | organized in one or several IGP instances   |
+       |             | or BGP domains.  Color re-mapping may       |
+       |             | happen at color domain boundaries.          |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       | Resolution  | An inter-domain BGP CAR route (E, C) from N |
+       | of a BGP    | is resolved on an intra-domain color-aware  |
+       | CAR route   | path (N, C) where N is the next-hop of the  |
+       | (E, C)      | BGP CAR route.                              |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       | Resolution  | In this document and consistently with the  |
+       | vs Steering | terminology of the SR Policy document       |
+       |             | [RFC9256], steering is used to describe the |
 
 
 
-Rao, et al.             Expires 27 February 2023                [Page 4]
+Rao, et al.                Expires 8 July 2023                  [Page 4]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   |             | Service Steering: Service route -> BGP CAR path    |
-   |             | (or other Color-Aware Routed Paths: e.g., SR       |
-   |             | Policy)                                            |
-   +-------------+----------------------------------------------------+
-   +-------------+----------------------------------------------------+
-   |             | Intra-Domain Resolution: BGP CAR route -> intra-   |
-   |             | domain color aware path (e.g.  SR Policy, IGP      |
-   |             | Flex-Algo, BGP CAR)                                |
-   +-------------+----------------------------------------------------+
+       |             | mapping of a service route onto a BGP CAR   |
+       |             | path while the term resolution is preserved |
+       |             | for the mapping of an inter-domain BGP CAR  |
+       |             | route on an intra-domain color-aware path.  |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       |             | Service Steering: Service route -> BGP CAR  |
+       |             | path (or other Color-Aware Routed Paths:    |
+       |             | e.g.  SR Policy)                            |
+       +-------------+---------------------------------------------+
+       +-------------+---------------------------------------------+
+       |             | Intra-Domain Resolution: BGP CAR route ->   |
+       |             | intra-domain color aware path (e.g.  SR     |
+       |             | Policy, IGP Flex-Algo, BGP CAR) or          |
+       |             | traditional routing/TE path (e.g.  RSVP-TE, |
+       |             | IGP/LDP, BGP-LU)                            |
+       +-------------+---------------------------------------------+
 
-                                 Table 1
+                                  Table 1
 
 1.2.  Illustration
 
@@ -269,18 +275,18 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
       -  Flex-Algo FA2 is mapped to "low delay and avoid resource R" and
          hence C2
 
+
+
+Rao, et al.                Expires 8 July 2023                  [Page 5]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    E1 receives two service routes from E2:
 
    *  V/v with BGP Color Extended-Community C1
 
    *  W/w with BGP Color Extended-Community C2
-
-
-
-Rao, et al.             Expires 27 February 2023                [Page 5]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
    E1 has the following color-aware paths:
 
@@ -325,18 +331,14 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
          resolved within domain 2 onto an SR Policy bound to the color
          of V/v
 
-   Other properties:
 
 
-
-
-
-
-
-Rao, et al.             Expires 27 February 2023                [Page 6]
+Rao, et al.                Expires 8 July 2023                  [Page 6]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
+
+   Other properties:
 
    *  MPLS dataplane: with 300k PE's and 5 colors, the BGP CAR solution
       ensures that no single node needs to support a dataplane scaling
@@ -385,14 +387,14 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    *  NLRI non-key encapsulation data: MPLS label stack, Label index,
       SRv6 SID list etc.
 
-   *  BGP Next Hop
 
 
-
-Rao, et al.             Expires 27 February 2023                [Page 7]
+Rao, et al.                Expires 8 July 2023                  [Page 7]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
+
+   *  BGP Next Hop
 
    *  AIGP Metric: accumulates color/intent specific metric across
       domains
@@ -439,37 +441,53 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    *  the dataplane availability constraint of T may be relaxed, to use
       an alternate encapsulation
 
+
+
+
+
+Rao, et al.                Expires 8 July 2023                  [Page 8]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    *  a performance-measurement verification may be added to ensure that
       the intent associated with C is met (e.g. delay < bound)
 
-
-
-
-Rao, et al.             Expires 27 February 2023                [Page 8]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+   A path that is not valid MUST NOT be considered for path selection.
 
 
 2.5.  BGP CAR Route Resolution
 
-   A BGP color-aware route (E2, C1) from N is resolved over a color-
-   aware route (N, C1).  The color-aware route (N, C1) may be provided
-   recursively by BGP CAR or by other routing solutions: SR Policy, IGP
-   Flex-Algo, RSVP-TE, BGP-LU.
+   A BGP color-aware route (E2, C1) from N is automatically resolved
+   over a color-aware route (N, C1) by default.  The color-aware route
+   (N, C1) is provided by color aware mechanisms such as IGP Flex-Algo,
+   SR policy or recursively by BGP CAR.  When multiple producers of
+   (N,C1) are available, the default preference is: IGP Flex-Algo, SR
+   Policy, BGP CAR.
 
-   When multiple resolutions are possible, the default preference should
-   be: IGP Flex-Algo, SR Policy, RSVP-TE, BGP CAR, BGP LU.
+   Local policy can provide additional control and options:
 
-   Through local policy, a BGP color-aware route (E2, C1) from N may be
-   resolved over a color-aware route (N, C2): i.e. the local policy maps
-   the resolution of C1 over C2.  For example, in a domain where
-   resource R is known to not be present, the inter-domain intent
-   C1="low delay and avoid R" may be resolved over an intra-domain path
-   of intent C2="low delay".  Another example is, if no (N, C1) path is
-   available, and the user has allowed resolution via C2.
+   *  A BGP color-aware route (E2, C1) from N may be resolved over a
+      color-aware route (N, C2): i.e. the local policy maps the
+      resolution of C1 over C2. 
+      
+      - For example, in a domain where resource R is known to not be 
+        present, the inter-domain intent C1="low delay and avoid R" 
+        may be resolved over an intra-domain path of intent C2="low delay". 
 
-   Resolution may also be automated using Color-EC as illustrated in
-   Appendix B.2 .
+      - Another example is, if no (N, C1) path is available, and the 
+        user has allowed resolution to fallback via C2.
+
+   *  Resolution may be mapped to traditional mechanisms that are unaware of 
+      color, such as RSVP-TE, IGP/LDP, BGP LU.
+
+   Route resolution via different color may be automated by attaching BGP Color extended
+   Community C2 to CAR route (E2, C1), leveraging Automated Steering as described 
+   in section 8.4 of Segment Routing Policy Architecture [RFC9256].  This mechanism 
+   is illustrated in section B.2.
+
+   Local policy takes precedence over default color based automated resolution. For a CAR route, 
+   Color-EC color takes precedence over route NLRI color.
 
    The color-aware route (N, C1) may have a different dataplane
    encapsulation than the one of (E2, C1): e.g. a BGP CAR route (E2, C1)
@@ -480,6 +498,16 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    The Accumulated IGP (AIGP) Attribute is updated as the BGP CAR route
    propagates across the network.
+
+
+
+
+
+
+Rao, et al.                Expires 8 July 2023                  [Page 9]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
 
    The value set (or appropriately incremented) in the AIGP TLV
    corresponds to the metric associated with the underlying intent of
@@ -495,16 +523,6 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    the AIGP TLV.
 
    AIGP metric computation is recursive.
-
-
-
-
-
-
-Rao, et al.             Expires 27 February 2023                [Page 9]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
    To avoid continuous IGP metric churn causing end to end BGP CAR
    churn, an implementation should provide thresholds to trigger AIGP
@@ -538,6 +556,15 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    that these two domains do not share the same color-to-intent mapping.
    Low-delay in domain 2 is color C2 while C1 in domain 1 (C1 <> C2).
 
+
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 10]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    The BGP CAR solution seamlessly supports this (rare) scenario while
    maintaining the separation and independence of the administrative
    authority in different color domains.
@@ -554,13 +581,6 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    *  A maps C2 in LCM-EC to C1 and signals within domain 1 the received
       BGP CAR route as (E2, C2) via A with LCM-EC(C1)
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 10]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
    *  The nodes within the receiving domain 1 use the local color
       encoded in the LCM-EC for next-hop resolution and service steering
@@ -591,6 +611,16 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    in [RFC4760], by using capability code 1 (multi-protocol BGP), with
    AFI 1 and 2 (as required) and SAFI TBD1.
 
+
+
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 11]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    The sub-sections below specify the generic encoding of the BGP CAR
    NLRI followed by the encoding for specific NLRI types introduced in
    this document.
@@ -610,13 +640,6 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
    where:
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 11]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
    *  NLRI Length: 1 octet field that indicates the length in octets of
       the NLRI excluding the NLRI Length field itself.
@@ -642,13 +665,28 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    types.  This can help deployed Route Reflectors (RR) to propagate
    NLRI types introduced in the future in a transparent manner.
 
+   It also helps make error handling more resilient and minimally 
+   disruptive as described in Section 2.11.
+
+
+
+
+
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 12]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    A route (NLRI) can carry more than one non-key TLV (of different
    types).  This provides significant benefits such as signaling
    multiple encapsulations simultaneously for the same route, each with
    a different value (label/SID etc).  This enables simpler, efficient
    migrations with low overhead :
 
-   *  avoids duplicate routes to signal different encapsulations
+   *  avoids need for duplicate routes to signal different encapsulations 
 
    *  avoids need for separate control planes for distribution
 
@@ -661,18 +699,6 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    The Color-Aware Routes NLRI Type is used for advertisement of color-
    aware routes and has the following format:
-
-
-
-
-
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 12]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -702,6 +728,14 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    *  NLRI Type: 1
 
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 13]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    *  Type-Specific Key Fields: as below
 
       -  Prefix Length: 1 octet field that carries the length of prefix
@@ -713,22 +747,17 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
          prefix, i.e., 0 octet for prefix length 0, 1 octet for prefix
          length 1 to 8, 2 octets for prefix length 9 to 16, 3 octets for
          prefix length 17 up to 24, 4 octets for prefix length 25 up to
-         32, and so on.  The size of the field MUST be less than or
-         equal to 4 for IPv4 (AFI=1) and less than or equal to 16 for
-         IPv6 (AFI=2).
+         32, and so on, followed by enough trailing bits to make the end 
+         of the field fall on an octet boundary.  Note that the value of 
+         the trailing bits is irrelevant. The size of the field MUST be 
+         less than or equal to 4 for IPv4 (AFI=1) and less than or equal 
+         to 16 for IPv6 (AFI=2).
 
       -  Color: 4 octets that contains color value associated with the
          prefix.
 
    *  Type-Specific Non-Key Fields: specified in the form of optional
       TLVs as below:
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 13]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
       -  Type: 1 octet that contains the type code and flags.  It is
          encoded as shown below:
@@ -758,6 +787,13 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
          o  Type code: Remaining 6 bits contain the type of the TLV.
 
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 14]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
       -  Length: 1 octet field that contains the length of the value
          portion of the non-key TLV in terms of octets
 
@@ -775,16 +811,6 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    The following sub-sections specify the non-key TLVs associated with
    the Color-Aware Routes NLRI type.
-
-
-
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 14]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
 2.9.2.1.  Label TLV
 
@@ -814,6 +840,16 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
       used for encoding a single label or a stack of labels as per
       procedures specified in [RFC8277].
 
+
+
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 15]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    When a BGP transport CAR speaker is propagating the route further
    after setting itself as the nexthop, it allocates a local label for
    the specific prefix and color combination which it updates in this
@@ -826,21 +862,6 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    The Label Index TLV is used for advertisement of Segment Routing MPLS
    (SR-MPLS) Segment Identifier (SID) [RFC8402] information associated
    with the labeled color-aware routes and has the following format:
-
-
-
-
-
-
-
-
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 15]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -877,6 +898,14 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    When a BGP Transport CAR speaker is propagating the route further
    after setting itself as the nexthop, it allocates a local label for
    the specific prefix and color combination.  When the received update
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 16]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    has the Label Index TLV, it SHOULD use that hint to allocate the
    local label from the SR Global Block (SRGB) using procedures as
    specified in [RFC8669].
@@ -885,18 +914,10 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    BGP Transport CAR can be also used to setup end-to-end color-aware
    connectivity using Segment Routing over IPv6 (SRv6) [RFC8402].
-   [I-D.ietf-spring-srv6-network-programming] specifies the SRv6
-   Endpoint behaviors (e.g.  End PSP) which MAY be leveraged for BGP CAR
-   with SRv6.The SRv6 SID TLV is used for advertisement of color-aware
-   routes along with their SRv6 SIDs and has the following format:
-
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 16]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
+   [RFC8986] specifies the SRv6 Endpoint behaviors (e.g.  End PSP) which
+   MAY be leveraged for BGP CAR with SRv6.The SRv6 SID TLV is used for
+   advertisement of color-aware routes along with their SRv6 SIDs and
+   has the following format:
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -917,21 +938,40 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
       -  A single 128-bit SRv6 SID or a stack of 128-bit SRv6 SIDs
 
-      -  A transposed portion (refer [I-D.ietf-bess-srv6-services]) of
-         the SRv6 SID that MUST be of size in multiples of one octet and
-         less than 16.
+      -  A transposed portion (refer [RFC9252]) of the SRv6 SID that
+         MUST be of size in multiples of one octet and less than 16.
+
+   BGP CAR SRv6 SID TLV definitions provide the following benefits:
+
+   *  Native encoding of SIDs avoid robustness issue with overloading 
+      of MPLS label fields.
+
+   *  Simple encoding to signal Unique SIDs (non-transposition), 
+      maintaining BGP update prefix packing
+
+   *  Highly efficient transposition scheme (12-14 bytes saved per NLRI), 
+      also maintaining BGP update prefix packing
 
    The BGP color-aware route update for SRv6 MUST include the BGP
    Prefix-SID attribute along with the TLV carrying the SRv6 SID
-   information as specified in [I-D.ietf-bess-srv6-services] when using
-   the transposition scheme of encoding for packing efficiency of BGP
-   updates.
+   information as specified in [RFC9252] when using the transposition
+   scheme of encoding for packing efficiency of BGP updates.
 
 2.9.3.  Local-Color-Mapping (LCM) Extended Community
 
    This document defines a new BGP Extended Community called "LCM".  The
    LCM is a Transitive Opaque Extended Community with the following
    encoding:
+
+
+
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 17]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -947,34 +987,79 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    *  Sub-Type: TBD2.
 
-
-
-Rao, et al.             Expires 27 February 2023               [Page 17]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
-
    *  Reserved: 2 octet of reserved field that MUST be set to zero on
       transmission and ignored on reception.
 
    *  Color: 4-octet field that carries the 32-bit color value.
 
-   When a CAR route crosses the originator color domain's boundary, LCM
-   EC is added.  LCM EC conveys the local color mapping for the intent
-   (e.g. low latency) into transit or remote color domains.
+   When a CAR route crosses the originator's color domain boundary, LCM-
+   EC is added.  LCM-EC conveys the local color mapping for the intent
+   (e.g. low latency) in other (transit or destination) color domains.
 
-   An implementation SHOULD NOT send more than one instance of the LCM
+   An implementation SHOULD NOT send more than one instance of the LCM-
    EC.  However, if more than one instance is received, an
    implementation MUST disregard all instances other than the one with
    the numerically highest value.
 
-   The LCM EC MAY be used for filtering of BGP CAR routes and/or for
+   If present, LCM-EC is the effective intent of a BGP CAR route.
+
+   LCM-EC Color is used instead of the Color in CAR route NLRI for
+   procedures described in earlier sections such as route validation,
+   resolution, AIGP calculation and steering.
+
+   The LCM-EC MAY be used for filtering of BGP CAR routes and/or for
    applying routing policies for the intent, when present.
 
-2.10.  Error Handling
+2.10.  LCM and BGP Color Extended Community usage
+
+   There are 2 distinct requirements to be supported as stated in
+   [I-D.hr-spring-intentaware-routing-using-color]":
+
+   1.  Domains with different intent granularity (section 6.3.1.9)
+
+   2.  Network domains under different administration, i.e., color domains 
+       (section 4.1)
+
+
+
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 18]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
+   Requirement 1 is the case where within the same administrative or
+   color domain, BGP CAR routes for N end-to-end intents may need to
+   traverse across an intermediate domain where only M intents are
+   available, N >= M.  Example: a multi-domain network is designed as
+   Access-Core-Access.  The core may have the most granular N intents,
+   whereas the access only has fewer M intents.  So, the BGP nexthop
+   resolution for a CAR route in the access domain must be via a color-
+   aware path for one of these M intents.  As described in the section
+   2.5 and B.2, BGP Color Extended Community is used to automate the
+   resolution.
+
+   For requirement 2, where CAR routes traverse across different color
+   domains, LCM-EC is used to carry the local color mapping for the NLRI
+   color as already described in Section 2.8 and Appendix.B.3
+
+   Both LCM-EC and BGP Color Extended Community may be present in BGP
+   CAR route.  Example: BGP CAR route (E, C1) from color domain D1, with
+   LCM-EC C2 in color domain D2, may also have Color-EC C3 and next-hop
+   N in a transit network domain in D2 that has intent C3 available and
+   resolves C2 via C3.
+
+   Default order of processing for resolution in presence of LCM-EC is 
+   local policy, then BGP Color-EC, and then LCM-EC color.
+
+2.11.  Error Handling
 
    The error handling actions as described in [RFC7606] are applicable
-   for handling of BGP update messages for BGP-CAR.
+   for handling of BGP update messages for BGP-CAR. In general, as 
+   indicated in [RFC 7606], the goal is to minimize the disruption
+   of a session reset or afi/safi disable to the extent possible.
 
    When the error determined allows for the router to skip the malformed
    NLRI(s) and continue processing of the rest of the update message,
@@ -986,52 +1071,74 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    Alternately, the router MUST perform 'session reset' when the session
    is only being used for BGP-CAR.
 
-   Following errors result in 'AFI/SAFI disable' or 'session reset':
+   The CAR NLRI definition encodes NLRI length and key length explicitly.
+   The NLRI length MUST be relied upon to enable the beginning of the next 
+   NLRI field to be located. Key length MUST be relied upon to extract the 
+   key and perform ‘treat-as-withdraw’ for malformed information.
 
-   *  Minimum NLRI length check error.
+   A sender MUST ensure that the NLRI and key lengths are number of actual 
+   bytes encoded in NLRI and key fields respectively, regardless of 
+   content being encoded.
 
-   *  NLRI length conflict with key length.
+   Given NLRI length and Key length MUST be valid, failures in following 
+   checks result in 'AFI/SAFI disable' or 'session reset':
 
-   *  Key length encoding errors (such as minimum, maximum and conflict
-      with prefix length).
+   *  Minimum NLRI length (must be atleast 2, as key length and NLRI type
+      are required fields) 
 
-   There can be cases where the NLRI length value is in conflict with
-   the enclosed non-key TLVs, which themselves carry length values.
-   Either the length of a TLV would cause the NLRI length to be exceeded
-   when parsing the TLV, or fewer than 2 bytes remain when beginning to
-   parse the TLV.
-
+   *  Key Length MUST be at least two less than NLRI Length
 
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 18]
+Rao, et al.                Expires 8 July 2023                 [Page 19]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
+   
+   NLRI Type specific error handling:
 
-   In either of these cases, an error condition exists and the "treat-
-   as-withdraw" approach MUST be used (unless some other, more severe
-   error is encountered dictating a stronger approach), and the NLRI
-   Length MUST be relied upon to enable the beginning of the next NLRI
-   field to be located.  The above recommendations follow the principle
-   defined in section 4 of [RFC7606].
+   *  By default, a speaker SHOULD discard unrecognized or unsupported NLRI type 
+      and move to next NLRI.
 
-   Type-Specific Non-Key TLV handling
+   *  Key length and key errors of known NLRI type SHOULD result in discard of 
+      NLRI similar to unrecognized NLRI type.(This MUST be logged for 
+      trouble shooting).
 
+   Transparent propagation of unrecognized NLRI type:
+   
+   *  Key length allows unrecognized route types to transit through RR 
+      transparently without a software upgrade.  Such RR does not need to 
+      interpret key portion of NLRI and works on opaque key of given length. An 
+      implementation SHOULD provide a knob that controls the RR unrecognized route 
+      type propagation behavior and possibly at granularity of route type values 
+      allowed. This gives ability to operator to allow specific route type 
+      transparent reflection based on client speaker support.
+
+   *  In such a case RR may reflect NLRIs with NLRI type specific key length and 
+      field errors. Clients of such RR that consume the route for installation 
+      will perform the key error handling of known NLRI type or discard 
+      unrecognized type. This prevents propagation of routes with NLRI errors any 
+      further in network.
+
+   Type-Specific Non-Key TLV handling:
+ 
+   *  Either the length of a TLV would cause the NLRI length to be exceeded when 
+      parsing the TLV, or fewer than 2 bytes remain when beginning to parse the TLV. 
+      Type specific length constraints should be verified.  The TLV MUST be
+      discarded if there is an error.
+ 
    *  If multiple instances of same type are encountered, all but the
       first instance MUST be ignored.
-
-   *  Type specific length constraints should be verified.  The TLV is
-      discarded if there is an error.
-
+ 
    *  A TLV is not considered malformed because of failing any semantic
       validation of its Value field.
-
+ 
    *  Speaker modifying the BGP next-hop MUST recognize at least one of
-      the forwarding information TLV (such as label and SRv6 SID).  If
+      the forwarding information TLVs (such as label and SRv6 SID).  If
       it is not able to, such NLRI is considered invalid and not
       eligible for best path selection.
+
 
 3.  Service route Automated Steering on Color-Aware path
 
@@ -1042,29 +1149,26 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    This is consistent with the automated service route steering on SR
    Policy (a routing solution providing color-aware path) defined in
-   [I-D.ietf-spring-segment-routing-policy].  All the steering
-   variations defined in [I-D.ietf-spring-segment-routing-policy] are
+   [RFC9256].  All the steering variations defined in [RFC9256] are
    applicable to BGP CAR color-aware path: on-demand steering, per-
    destination, per-flow, CO-only.  For brevity, in this revision, we
-   refer the reader to the [I-D.ietf-spring-segment-routing-policy]
-   text.
+   refer the reader to the [RFC9256] text.
 
    Salient property: Seamless integration of BGP CAR and SR Policy.
 
    Service steering via BGP CAR is applicable to any BGP SAFI, including
    SAFIs for IPv4/IPv6, L3VPN, PW, EVPN, FlowSpec, and BGP-LU.
 
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 20]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    Appendix A provides illustrations of service route automated
    steering.
-
-
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 19]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
 4.  Intents
 
@@ -1112,15 +1216,15 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
                            |                   |
          <-- (E2, C1) ----   <--- (E2, C1) ----
 
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 21]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
    *  BGP CAR route (E2, C1) advertised by E2 is not unconditionally
       distributed beyond a certain point (e.g., B)
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 20]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
    *  E1 subscribes to (E2, C1) by advertising a filter route F (E2, C1)
       to its upstream peer A
@@ -1151,11 +1255,15 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    *  No node should learn and install a BGP CAR route to (E,C) if it
       does not install a Colored service route to E
 
+   Two key principles used to address the scaling requirements are a 
+   hierarchical network and routing design, and on-demand route 
+   subscription and filtering.
+
    Figure 2 provides an ultra-scale reference topology.  Section 6.2
    presents three design models to deploy BGP CAR in the reference
-   topology.  Section 6.3 analyses the scaling properties of each model.
-   Section 6.4 illustrates the scaling benefits of the (E, C) BGP
-   subscription and filtering.
+   topology, including hierarchical options.  Section 6.3 analyses 
+   the scaling properties of each model. Section 6.4 illustrates the 
+   scaling benefits of the (E, C) BGP subscription and filtering.
 
 6.1.  Ultra-Scale Reference Topology
 
@@ -1170,12 +1278,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 21]
+Rao, et al.                Expires 8 July 2023                 [Page 22]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
                                          RD:V/v via E2
@@ -1229,9 +1334,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 22]
+Rao, et al.                Expires 8 July 2023                 [Page 23]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
 6.2.  Deployment model
@@ -1285,9 +1390,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 23]
+Rao, et al.                Expires 8 July 2023                 [Page 24]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
        1.  Color-aware path (121, C1) is FA128 path to 121 (label
@@ -1341,9 +1446,9 @@ iPE            iBRM            iBRC          eBRC          eBRM      ePE
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 24]
+Rao, et al.                Expires 8 July 2023                 [Page 25]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    2.   Each BGP hop allocates local label and programs swap entry in
@@ -1397,9 +1502,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 25]
+Rao, et al.                Expires 8 July 2023                 [Page 26]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    12.  451 performs swap operation on 168002 bound to color-aware path
@@ -1453,9 +1558,9 @@ iPE            iBRM            iBRC          eBRC          eBRM      ePE
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 26]
+Rao, et al.                Expires 8 July 2023                 [Page 27]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    5.   121 also advertises (451, C1) to E1 with next hop self (121) and
@@ -1509,9 +1614,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 27]
+Rao, et al.                Expires 8 July 2023                 [Page 28]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
        |        E1           |       121           |       231
@@ -1557,6 +1662,10 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
          with (451,C) where there may be thousands of 451's and 5 C's
          hence well under the 1M MPLS dataplane
 
+      -  They also aid faster convergence by allowing the PE routes to
+         be distributed via out-of-band RRs that can be scaled 
+         independent of the transport BRs. 
+
    *  The next-hop-self option at ingress BRM (e.g. 121) hides the
       hierarchical design from the ingress PE, keeping its outgoing
       label programming as simple as the flat model.  However, the
@@ -1565,9 +1674,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 28]
+Rao, et al.                Expires 8 July 2023                 [Page 29]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
       needs to support a swap and push operation.  It also needs to
@@ -1621,9 +1730,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 29]
+Rao, et al.                Expires 8 July 2023                 [Page 30]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    *  The use of Anycast SID naturally provides fast local convergence
@@ -1677,9 +1786,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 30]
+Rao, et al.                Expires 8 July 2023                 [Page 31]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    1.   CE2 sends to PE2     : [(V, CC), Label L1]  via CE2        with LCM (CP)
@@ -1733,9 +1842,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 31]
+Rao, et al.                Expires 8 July 2023                 [Page 32]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
 9.  IANA Considerations
@@ -1789,9 +1898,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 32]
+Rao, et al.                Expires 8 July 2023                 [Page 33]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
 9.3.  Guidance for Designated Experts
@@ -1823,11 +1932,23 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    and non-conflicting color allocation across the different network
    domains in that color domain.
 
-   If networks under different administrative control establish a shared
+   When color-aware routes propagate across a color domain boundary, there
+   is typically no need for coordinating color assignments, since the IP prefix
+   is unique, and hence makes the color scope also unique and non-conflicting.
+
+   The color only needs to be re-mapped into a local color assigned for the same 
+   intent (Which is carried in the LCM-EC).
+
+   However, if such networks under different administrative control establish a shared
    transport service between them, where the same transport IP address
    is co-ordinated and shared across the two networks, then the color
    assignments associated with that IP address should also be co-
    ordinated to avoid any conflicts in either network.
+
+   It should be noted that the color assignments coordination are only necessary for 
+   routes to the shared service IP. Colors used for intra-domain or for inter-domain
+   intents associated with the unique IP addresses do not need any coordination.
+
 
 11.  Co-authors
 
@@ -1845,9 +1966,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 33]
+Rao, et al.                Expires 8 July 2023                 [Page 34]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    Luay Jalil
@@ -1901,9 +2022,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 34]
+Rao, et al.                Expires 8 July 2023                 [Page 35]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    Reza Rokui
@@ -1920,112 +2041,84 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 14.1.  Normative References
 
-   [I-D.ietf-bess-srv6-services]
-              Dawra, G., Talaulikar, K., Raszuk, R., Decraene, B.,
-              Zhuang, S., and J. Rabadan, "BGP Overlay Services Based on
-              Segment Routing over IPv6 (SRv6)", Work in Progress,
-              Internet-Draft, draft-ietf-bess-srv6-services-15, 22 March
-              2022, <https://datatracker.ietf.org/api/v1/doc/document/
-              draft-ietf-bess-srv6-services/>.
+   [I-D.hr-spring-intentaware-routing-using-color]
+              Hegde, S., Rao, D., Sangli, S. R., Agrawal, S., Filsfils,
+              C., Talaulikar, K., Patel, K., Uttaro, J., Decraene, B.,
+              Bogdanov, A., Jalil, L., Alston, A., Xu, X., Gulko, A.,
+              Khaddam, M., Contreras, L. M., Steinberg, D., Guichard,
+              J., Henderickx, W., and C. Bowers, "Problem statement for
+              Inter-domain Intent-aware Routing using Color", Work in
+              Progress, Internet-Draft, draft-hr-spring-intentaware-
+              routing-using-color-00, 15 July 2022,
+              <https://www.ietf.org/archive/id/draft-hr-spring-
+              intentaware-routing-using-color-00.txt>.
 
    [I-D.ietf-idr-bgp-ipv6-rt-constrain]
               Patel, K., Raszuk, R., Djernaes, M., Dong, J., and M.
               Chen, "IPv6 Extensions for Route Target Distribution",
               Work in Progress, Internet-Draft, draft-ietf-idr-bgp-ipv6-
               rt-constrain-12, 26 April 2018,
-              <https://datatracker.ietf.org/api/v1/doc/document/draft-
-              ietf-idr-bgp-ipv6-rt-constrain/>.
-
-   [I-D.ietf-idr-tunnel-encaps]
-              Patel, K., Velde, G. V. D., Sangli, S. R., and J. Scudder,
-              "The BGP Tunnel Encapsulation Attribute", Work in
-              Progress, Internet-Draft, draft-ietf-idr-tunnel-encaps-22,
-              7 January 2021,
-              <https://datatracker.ietf.org/api/v1/doc/document/draft-
-              ietf-idr-tunnel-encaps/>.
+              <https://www.ietf.org/archive/id/draft-ietf-idr-bgp-ipv6-
+              rt-constrain-12.txt>.
 
    [I-D.ietf-lsr-flex-algo]
               Psenak, P., Hegde, S., Filsfils, C., Talaulikar, K., and
               A. Gulko, "IGP Flexible Algorithm", Work in Progress,
-              Internet-Draft, draft-ietf-lsr-flex-algo-20, 18 May 2022,
-              <https://datatracker.ietf.org/api/v1/doc/document/draft-
-              ietf-lsr-flex-algo/>.
+              Internet-Draft, draft-ietf-lsr-flex-algo-26, 17 October
+              2022, <https://www.ietf.org/archive/id/draft-ietf-lsr-
+              flex-algo-26.txt>.
 
-   [I-D.ietf-spring-segment-routing-policy]
-              Filsfils, C., Talaulikar, K., Voyer, D., Bogdanov, A., and
-              P. Mattes, "Segment Routing Policy Architecture", Work in
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 35]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
-
-              Progress, Internet-Draft, draft-ietf-spring-segment-
-              routing-policy-22, 22 March 2022,
-              <https://datatracker.ietf.org/api/v1/doc/document/draft-
-              ietf-spring-segment-routing-policy/>.
-
-   [I-D.ietf-spring-srv6-network-programming]
-              Filsfils, C., Garvia, P. C., Leddy, J., Voyer, D.,
-              Matsushima, S., and Z. Li, "Segment Routing over IPv6
-              (SRv6) Network Programming", Work in Progress, Internet-
-              Draft, draft-ietf-spring-srv6-network-programming-28, 29
-              December 2020,
-              <https://datatracker.ietf.org/api/v1/doc/document/draft-
-              ietf-spring-srv6-network-programming/>.
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
+   [RFC2119]  Bradner, S. and RFC Publisher, "Key words for use in RFCs
+              to Indicate Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 36]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
 
    [RFC4360]  Sangli, S., Tappan, D., and Y. Rekhter, "BGP Extended
               Communities Attribute", RFC 4360, DOI 10.17487/RFC4360,
               February 2006, <https://www.rfc-editor.org/info/rfc4360>.
 
    [RFC4684]  Marques, P., Bonica, R., Fang, L., Martini, L., Raszuk,
-              R., Patel, K., and J. Guichard, "Constrained Route
-              Distribution for Border Gateway Protocol/MultiProtocol
-              Label Switching (BGP/MPLS) Internet Protocol (IP) Virtual
-              Private Networks (VPNs)", RFC 4684, DOI 10.17487/RFC4684,
-              November 2006, <https://www.rfc-editor.org/info/rfc4684>.
+              R., Patel, K., Guichard, J., and RFC Publisher,
+              "Constrained Route Distribution for Border Gateway
+              Protocol/MultiProtocol Label Switching (BGP/MPLS) Internet
+              Protocol (IP) Virtual Private Networks (VPNs)", RFC 4684,
+              DOI 10.17487/RFC4684, November 2006,
+              <https://www.rfc-editor.org/info/rfc4684>.
 
    [RFC4760]  Bates, T., Chandra, R., Katz, D., and Y. Rekhter,
               "Multiprotocol Extensions for BGP-4", RFC 4760,
               DOI 10.17487/RFC4760, January 2007,
               <https://www.rfc-editor.org/info/rfc4760>.
 
-   [RFC5512]  Mohapatra, P. and E. Rosen, "The BGP Encapsulation
-              Subsequent Address Family Identifier (SAFI) and the BGP
-              Tunnel Encapsulation Attribute", RFC 5512,
+   [RFC5512]  Mohapatra, P., Rosen, E., and RFC Publisher, "The BGP
+              Encapsulation Subsequent Address Family Identifier (SAFI)
+              and the BGP Tunnel Encapsulation Attribute", RFC 5512,
               DOI 10.17487/RFC5512, April 2009,
               <https://www.rfc-editor.org/info/rfc5512>.
 
-   [RFC5701]  Rekhter, Y., "IPv6 Address Specific BGP Extended Community
-              Attribute", RFC 5701, DOI 10.17487/RFC5701, November 2009,
+   [RFC5701]  Rekhter, Y. and RFC Publisher, "IPv6 Address Specific BGP
+              Extended Community Attribute", RFC 5701,
+              DOI 10.17487/RFC5701, November 2009,
               <https://www.rfc-editor.org/info/rfc5701>.
 
-
-
-
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 36]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
-
-   [RFC7311]  Mohapatra, P., Fernando, R., Rosen, E., and J. Uttaro,
-              "The Accumulated IGP Metric Attribute for BGP", RFC 7311,
-              DOI 10.17487/RFC7311, August 2014,
+   [RFC7311]  Mohapatra, P., Fernando, R., Rosen, E., Uttaro, J., and
+              RFC Publisher, "The Accumulated IGP Metric Attribute for
+              BGP", RFC 7311, DOI 10.17487/RFC7311, August 2014,
               <https://www.rfc-editor.org/info/rfc7311>.
 
-   [RFC7606]  Chen, E., Ed., Scudder, J., Ed., Mohapatra, P., and K.
-              Patel, "Revised Error Handling for BGP UPDATE Messages",
-              RFC 7606, DOI 10.17487/RFC7606, August 2015,
+   [RFC7606]  Chen, E., Ed., Scudder, J., Ed., Mohapatra, P., Patel, K.,
+              and RFC Publisher, "Revised Error Handling for BGP UPDATE
+              Messages", RFC 7606, DOI 10.17487/RFC7606, August 2015,
               <https://www.rfc-editor.org/info/rfc7606>.
 
    [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
@@ -2033,12 +2126,22 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
               RFC 8126, DOI 10.17487/RFC8126, June 2017,
               <https://www.rfc-editor.org/info/rfc8126>.
 
-   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
-              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+   [RFC8174]  Leiba, B. and RFC Publisher, "Ambiguity of Uppercase vs
+              Lowercase in RFC 2119 Key Words", BCP 14, RFC 8174,
+              DOI 10.17487/RFC8174, May 2017,
+              <https://www.rfc-editor.org/info/rfc8174>.
 
-   [RFC8277]  Rosen, E., "Using BGP to Bind MPLS Labels to Address
-              Prefixes", RFC 8277, DOI 10.17487/RFC8277, October 2017,
+
+
+
+Rao, et al.                Expires 8 July 2023                 [Page 37]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
+
+
+   [RFC8277]  Rosen, E. and RFC Publisher, "Using BGP to Bind MPLS
+              Labels to Address Prefixes", RFC 8277,
+              DOI 10.17487/RFC8277, October 2017,
               <https://www.rfc-editor.org/info/rfc8277>.
 
    [RFC8402]  Filsfils, C., Ed., Previdi, S., Ed., Ginsberg, L.,
@@ -2047,10 +2150,32 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
               July 2018, <https://www.rfc-editor.org/info/rfc8402>.
 
    [RFC8669]  Previdi, S., Filsfils, C., Lindem, A., Ed., Sreekantiah,
-              A., and H. Gredler, "Segment Routing Prefix Segment
-              Identifier Extensions for BGP", RFC 8669,
+              A., Gredler, H., and RFC Publisher, "Segment Routing
+              Prefix Segment Identifier Extensions for BGP", RFC 8669,
               DOI 10.17487/RFC8669, December 2019,
               <https://www.rfc-editor.org/info/rfc8669>.
+
+   [RFC8986]  Filsfils, C., Ed., Camarillo, P., Ed., Leddy, J., Voyer,
+              D., Matsushima, S., Li, Z., and RFC Publisher, "Segment
+              Routing over IPv6 (SRv6) Network Programming", RFC 8986,
+              DOI 10.17487/RFC8986, February 2021,
+              <https://www.rfc-editor.org/info/rfc8986>.
+
+   [RFC9012]  Patel, K., Van de Velde, G., Sangli, S., Scudder, J., and
+              RFC Publisher, "The BGP Tunnel Encapsulation Attribute",
+              RFC 9012, DOI 10.17487/RFC9012, April 2021,
+              <https://www.rfc-editor.org/info/rfc9012>.
+
+   [RFC9252]  Dawra, G., Ed., Talaulikar, K., Ed., Raszuk, R., Decraene,
+              B., Zhuang, S., Rabadan, J., and RFC Publisher, "BGP
+              Overlay Services Based on Segment Routing over IPv6
+              (SRv6)", RFC 9252, DOI 10.17487/RFC9252, July 2022,
+              <https://www.rfc-editor.org/info/rfc9252>.
+
+   [RFC9256]  Filsfils, C., Talaulikar, K., Ed., Voyer, D., Bogdanov,
+              A., Mattes, P., and RFC Publisher, "Segment Routing Policy
+              Architecture", RFC 9256, DOI 10.17487/RFC9256, July 2022,
+              <https://www.rfc-editor.org/info/rfc9256>.
 
 14.2.  Informative References
 
@@ -2061,46 +2186,49 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
               mpls-07, 28 June 2014, <https://www.ietf.org/archive/id/
               draft-ietf-mpls-seamless-mpls-07.txt>.
 
-   [RFC3906]  Shen, N. and H. Smit, "Calculating Interior Gateway
-              Protocol (IGP) Routes Over Traffic Engineering Tunnels",
-              RFC 3906, DOI 10.17487/RFC3906, October 2004,
-              <https://www.rfc-editor.org/info/rfc3906>.
 
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 37]
+Rao, et al.                Expires 8 July 2023                 [Page 38]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
-   [RFC4271]  Rekhter, Y., Ed., Li, T., Ed., and S. Hares, Ed., "A
-              Border Gateway Protocol 4 (BGP-4)", RFC 4271,
-              DOI 10.17487/RFC4271, January 2006,
+   [RFC3906]  Shen, N., Smit, H., and RFC Publisher, "Calculating
+              Interior Gateway Protocol (IGP) Routes Over Traffic
+              Engineering Tunnels", RFC 3906, DOI 10.17487/RFC3906,
+              October 2004, <https://www.rfc-editor.org/info/rfc3906>.
+
+   [RFC4271]  Rekhter, Y., Ed., Li, T., Ed., Hares, S., Ed., and RFC
+              Publisher, "A Border Gateway Protocol 4 (BGP-4)",
+              RFC 4271, DOI 10.17487/RFC4271, January 2006,
               <https://www.rfc-editor.org/info/rfc4271>.
 
-   [RFC4272]  Murphy, S., "BGP Security Vulnerabilities Analysis",
-              RFC 4272, DOI 10.17487/RFC4272, January 2006,
-              <https://www.rfc-editor.org/info/rfc4272>.
+   [RFC4272]  Murphy, S. and RFC Publisher, "BGP Security
+              Vulnerabilities Analysis", RFC 4272, DOI 10.17487/RFC4272,
+              January 2006, <https://www.rfc-editor.org/info/rfc4272>.
 
-   [RFC4364]  Rosen, E. and Y. Rekhter, "BGP/MPLS IP Virtual Private
-              Networks (VPNs)", RFC 4364, DOI 10.17487/RFC4364, February
-              2006, <https://www.rfc-editor.org/info/rfc4364>.
+   [RFC4364]  Rosen, E., Rekhter, Y., and RFC Publisher, "BGP/MPLS IP
+              Virtual Private Networks (VPNs)", RFC 4364,
+              DOI 10.17487/RFC4364, February 2006,
+              <https://www.rfc-editor.org/info/rfc4364>.
 
-   [RFC5462]  Andersson, L. and R. Asati, "Multiprotocol Label Switching
-              (MPLS) Label Stack Entry: "EXP" Field Renamed to "Traffic
-              Class" Field", RFC 5462, DOI 10.17487/RFC5462, February
-              2009, <https://www.rfc-editor.org/info/rfc5462>.
+   [RFC5462]  Andersson, L., Asati, R., and RFC Publisher,
+              "Multiprotocol Label Switching (MPLS) Label Stack Entry:
+              "EXP" Field Renamed to "Traffic Class" Field", RFC 5462,
+              DOI 10.17487/RFC5462, February 2009,
+              <https://www.rfc-editor.org/info/rfc5462>.
 
-   [RFC6952]  Jethanandani, M., Patel, K., and L. Zheng, "Analysis of
-              BGP, LDP, PCEP, and MSDP Issues According to the Keying
-              and Authentication for Routing Protocols (KARP) Design
-              Guide", RFC 6952, DOI 10.17487/RFC6952, May 2013,
+   [RFC6952]  Jethanandani, M., Patel, K., Zheng, L., and RFC Publisher,
+              "Analysis of BGP, LDP, PCEP, and MSDP Issues According to
+              the Keying and Authentication for Routing Protocols (KARP)
+              Design Guide", RFC 6952, DOI 10.17487/RFC6952, May 2013,
               <https://www.rfc-editor.org/info/rfc6952>.
 
-   [RFC7911]  Walton, D., Retana, A., Chen, E., and J. Scudder,
-              "Advertisement of Multiple Paths in BGP", RFC 7911,
-              DOI 10.17487/RFC7911, July 2016,
+   [RFC7911]  Walton, D., Retana, A., Chen, E., Scudder, J., and RFC
+              Publisher, "Advertisement of Multiple Paths in BGP",
+              RFC 7911, DOI 10.17487/RFC7911, July 2016,
               <https://www.rfc-editor.org/info/rfc7911>.
 
 Appendix A.  Illustrations of Service Steering
@@ -2118,16 +2246,9 @@ A.1.  E2E BGP transport CAR intent realized using IGP FlexAlgo
 
 
 
-
-
-
-
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 38]
+Rao, et al.                Expires 8 July 2023                 [Page 39]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
                               RD:V/v via E2
@@ -2172,7 +2293,7 @@ iPE                     iABR                       eABR              ePE
 
    *  With reference to the topology above:
 
-      -  IGP FA 128 is running in each domain.
+      -  IGP FA 128 is running in each domain, and mapped to color C1
 
       -  Egress PE E2 advertises a VPN route RD:V/v colored with (color
          extended community) C1 to steer traffic to BGP transport CAR
@@ -2181,9 +2302,9 @@ iPE                     iABR                       eABR              ePE
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 39]
+Rao, et al.                Expires 8 July 2023                 [Page 40]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
       -  BGP CAR route (E2, C1) with next-hop, label-index and label as
@@ -2191,19 +2312,19 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
          domain.  When a RR is used in the domain, ADD-PATH is enabled
          to advertise multiple available paths.
 
-      -  Local policy on each hop maps intent C1 to resolve CAR route
-         next-hop over IGP FA 128 of the domain.  AIGP attribute
-         influences BGP CAR route best path decision as per [RFC7311].
-         BGP CAR label swap entry is installed that goes over FA 128 LSP
-         to next-hop providing intent in each IGP domain.  Update AIGP
-         metric to reflect FA 128 metric to next-hop.
+      -  On each BGP hop, (E2, C1) next-hop is resolved over IGP FA 128 
+         of the domain.  AIGP attribute influences BGP CAR route best 
+         path decision as per [RFC7311]. BGP CAR label swap entry is 
+         installed that goes over FA 128 LSP to next-hop providing intent 
+         in each IGP domain.  Update AIGP metric to reflect FA 128 metric 
+         to next-hop.
 
       -  Ingress PE E1 learns CAR route (E2, C1).  It steers colored VPN
          route RD:V/v into (E2, C1)
 
    *  Important:
 
-      -  IGP FA 128 top label provides intent in each domain.
+      -  IGP FA 128 top label provides intent within each domain.
 
       -  BGP CAR label (e.g. 168002) carries end to end intent.  Thus
          stitches intent over intra domain FA 128.
@@ -2237,9 +2358,9 @@ A.2.  E2E BGP transport CAR intent realized using SR Policy
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 40]
+Rao, et al.                Expires 8 July 2023                 [Page 41]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
                               RD:1/8 via E2
@@ -2293,9 +2414,9 @@ iPE                     iABR                     eABR                ePE
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 41]
+Rao, et al.                Expires 8 July 2023                 [Page 42]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
          o  SR policy (C,121) segments <S1, 121>
@@ -2314,8 +2435,8 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
          domain.  When a RR is used in the domain, ADD-PATH is enabled
          to advertise multiple available paths.
 
-      -  Local policy on each hop maps intent C1 to resolve CAR route
-         next-hop over an SR policy(C1, next-hop).  BGP CAR label swap
+      -  On each BGP hop, CAR route (E2, C1) next-hop is resolved
+         over an SR policy (C1, next-hop).  BGP CAR label swap
          entry is installed that goes over SR policy segment list.
 
       -  Ingress PE E1 learns CAR route (E2, C1).  It steers colored VPN
@@ -2349,9 +2470,9 @@ A.3.1.  Provide intent for service flows only in core domain running
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 42]
+Rao, et al.                Expires 8 July 2023                 [Page 43]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
                               RD:1/8 via E2
@@ -2395,8 +2516,8 @@ iPE                     iABR                       eABR              ePE
 
    *  With reference to the topology above:
 
-      -  IGP FA 128 is only enabled in Core (e.g.  WAN network).  Access
-         only has base algo 0.
+      -  IGP FA 128 is only enabled in Core (e.g.  WAN network), mapped
+         to C1. Access network domain only has base algo 0.
 
       -  Egress PE E2 advertises a VPN route RD:V/v colored with (color
          extended community) C1 to steer traffic via BGP transport CAR
@@ -2405,9 +2526,9 @@ iPE                     iABR                       eABR              ePE
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 43]
+Rao, et al.                Expires 8 July 2023                 [Page 44]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
       -  BGP CAR route (E2, C1) with next-hop, label-index and label as
@@ -2421,10 +2542,10 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
          next-hop.  Update AIGP metric to reflect algo 0 metric to next-
          hop with an additional penalty.
 
-      -  Local policy on 121 and 122 maps intent C1 to resolve CAR route
-         next-hop learnt from Core domain over IGP FA 128.  BGP CAR
-         label swap entry is installed that goes over FA 128 LSP to
-         next-hop providing intent in Core IGP domain.
+      -  On 121 and 122, CAR route (E2, C1) next-hop learnt from Core 
+         domain is resolved over IGP FA 128.  BGP CAR label swap entry 
+         is installed that goes over FA 128 LSP to next-hop providing 
+         intent in Core IGP domain.
 
       -  Ingress PE E1 learns CAR route (E2, C1).  It maps intent C1 to
          resolve CAR route next-hop over IGP base algo 0.  It steers
@@ -2461,9 +2582,9 @@ A.3.2.  Provide intent for service flows only in core domain over TE
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 44]
+Rao, et al.                Expires 8 July 2023                 [Page 45]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
                               RD:1/8 via E2
@@ -2517,9 +2638,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 45]
+Rao, et al.                Expires 8 July 2023                 [Page 46]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
       -  Egress PE E2 advertises a VPN route RD:V/v colored with (color
@@ -2573,9 +2694,9 @@ A.4.  Transit network domains that do not support CAR
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 46]
+Rao, et al.                Expires 8 July 2023                 [Page 47]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
       -  Network between BR2 and BR3 comprises of multiple BGP-LU hops
@@ -2629,9 +2750,9 @@ A.5.  Resource Avoidance using BGP CAR and IGP Flex-Algo
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 47]
+Rao, et al.                Expires 8 July 2023                 [Page 48]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    *  C1 and C2 represent two unique intents in multi-domain network
@@ -2685,9 +2806,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 48]
+Rao, et al.                Expires 8 July 2023                 [Page 49]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    *  C1 and C2 are realized over a common intra-domain intent (FA128)
@@ -2701,8 +2822,7 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 A.6.  Per-Flow Steering over CAR routes
 
    This section provides an example of ingress PE per-flow steering as
-   defined in section 8.6 of [I-D.ietf-spring-segment-routing-policy]
-   onto BGP CAR routes.
+   defined in section 8.6 of [RFC9256] onto BGP CAR routes.
 
    With reference to the Figure 6
 
@@ -2741,9 +2861,10 @@ A.6.  Per-Flow Steering over CAR routes
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 49]
+
+Rao, et al.                Expires 8 July 2023                 [Page 50]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    E1 receives three packets K, K1, and K2 on its incoming interface.
@@ -2778,57 +2899,84 @@ A.7.  Advertising BGP CAR routes for shared IP addresses
 
          Figure 11: BGP CAR advertisements for shared IP addresses
 
-   This example describes a case where the same transport IP address is
-   originated from multiple nodes in different domains.
+   This example describes a case where a route for the same transport 
+   IP address is originated from multiple nodes in different network
+   domains.
 
    One use of this scenario is an Anycast transport service, where
-   packet encapsulation may terminate on any one among a set of nodes.
-   All the nodes are capable of forwarding the inner payload, for
-   instance via an IP lookup in the global table.
+   packet encapsulation (e.g., LSP) may terminate on any one among 
+   a set of nodes. All the nodes are capable of forwarding the inner 
+   payload, typically via an IP lookup in the global table for Internet 
+   routes.
 
    A couple of variations of the use-case are described in the example
    below.
 
    One node is shown in each domain, but there will be multiple nodes in
-   practice.
+   practice for redundancy.
 
    Example-1: Anycast with forwarding to nearest
 
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 50]
+Rao, et al.                Expires 8 July 2023                 [Page 51]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
-   *  Both E2 and E3 advertise Anycast IP (IP1, C1) with same label L1
+   *  Both E2 and E3 advertise Anycast (shared) IP (IP1, C1) with same label L1
 
-   *  An ingress PE E1 receives by default the best path(s) propagated
-      through BGP hops across the network.
+   *  An ingress PE E1 receives by default the best path(s) for (IP1, C1)
+      propagated through BGP hops across the network.
 
-   *  The paths to (IP1, C1) from E2 and E3 may get merged at a common
-      node along the path to E1.
+   *  The paths to (IP1, C1) from E2 and E3 may merge at a common
+      node along the path to E1, forming equal cost multipaths or 
+      active-backup paths at that node.
 
-   *  Traffic for colored service routes steered at E1 via (IP1, C1) is
-      forwarded to either E2 or E3 (or both) as determined by the
-      network (nodes in the path).
+   *  Service route V/v is advertised from egress domains D1 and D2 with 
+      color C1 and next-hop IP1.
+
+   *  Traffic for V/v steered at E1 via (IP1, C1) is forwarded to either 
+      E2 or E3 (or both) as determined by routing along the network (nodes 
+      in the path).
 
    Example-2: Anycast with egress domain visibility at ingress PE
 
    *  E2 advertises (IP1, C1) and E3 advertises (IP1, C2) CAR routes for
-      the Anycast IP IP1.
+      the Anycast IP IP1. C1 and C2 are colors assigned to distinguish the 
+      egress domains originating the routes to IP1.
 
    *  An ingress PE E1 receives the best path(s) propagated through BGP
       hops across the network for both (IP1, C1) and (IP1, C2).
 
-   *  The two CAR routes do not get merged at any intermediate node,
-      providing E1 control over path selection and load-balancing of
-      traffic across these routes.
+   *  The CAR routes (IP1, C1) and (IP1, C2) do not get merged at any 
+      intermediate node, providing E1 control over path selection and 
+      load-balancing of traffic across these two routes. Each route may itself 
+      provide multipathing or Anycast to a set of egress nodes.
+  
+   *  Service route V/v advertised from egress domain D1 and D2 with colors 
+      C1 and C2 respectively, but with same next-hop IP1. 
+
+   *  E1 will resolve and steer V/v path from D1 via (IP1, C1) and path from D2 via (IP2, C2).
+      E1 will load-balance traffic to V/v across the two paths as determined by a local load-balancing policy. 
 
    *  Traffic for colored service routes steered at E1 is forwarded to
       either E2 or E3 (or load-balanced across both) as determined by
       E1.
+
+   In above example, D1 and D2 belonged to the same color or administrative domain. 
+   If D1 and D2 belonged to different color domains, the domains will coordinate the 
+   assignment of colors to be used with shared IP IP1 such that they do not cause conflicts.
+   For instance, in Example-1 :
+   
+   * D1 and D2 may both use C1 when they originate CAR route for IP1.
+     - In this case, naturally neither D1 nor D2 will use C1 for some other intent
+
+   * Alternatively, D1 may use C2 and D2 may use C3 for originating a CAR route for IP1 for the same intent.
+     - In this case, D1 will not use C3 for originating CAR route for IP1 for some other intent.
+       Similarly, D2 will not use C2 for originating CAR route for IP1 for some other intent.
+
 
 Appendix B.  Color Mapping Illustrations
 
@@ -2853,9 +3001,9 @@ B.1.  Single color domain containing network domains with N:N color
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 51]
+Rao, et al.                Expires 8 July 2023                 [Page 52]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
 B.2.  Single color domain containing network domains with N:M color
@@ -2864,27 +3012,27 @@ B.2.  Single color domain containing network domains with N:M color
    *  Certain network domains may not be enabled for some of the colors,
       but may still be required to provide transit.
 
-   *  When a (E, C) route traverses a domain where color C is not
+   *  When a (E, C1) route traverses a domain where color C1 is not
       available, the operator may decide to use a different intent of
-      color c that is available in that domain to resolve the next-hop
+      color C2 that is available in that domain to resolve the next-hop
       and establish a path through the domain.
 
       -  The next-hop resolution may occur via paths of any intra-domain
          protocol or even via paths provided by BGP CAR.
 
-      -  The next-hop resolution color c may be defined as a local
+      -  The next-hop resolution color C2 may be defined as a local
          policy at ingress or transit nodes of the domain.
 
       -  It may also be automatically signaled from egress border nodes
-         by attaching a color extended community with value c to the BGP
+         by attaching a color extended community with value C2 to the BGP
          CAR routes.
 
-   *  Hence, routes of N colors may be resolved via a smaller set of M
-      colored paths in a transit domain, while preserving the original
-      color-awareness end-to-end.
+   *  Hence, routes of N end-to-end colors may be resolved over paths from a 
+      smaller set of M colors in a transit domain, while preserving the 
+      original color-awareness end-to-end.
 
-   *  Any ingress PE that installs a service (VPN) route with a color C,
-      must have C enabled locally to install IP routes to (E, C) and
+   *  Any ingress PE that installs a service (VPN) route with a color C1,
+      must have C1 enabled locally to install IP routes to (E, C1) and
       resolve the service route next-hop.
 
    *  A degenerate variation of this scenario is where a transit domain
@@ -2909,9 +3057,9 @@ B.3.  Multiple color domains
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 52]
+Rao, et al.                Expires 8 July 2023                 [Page 53]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
 
    The reference topology above is used to elaborate on the design
@@ -2965,4 +3113,4 @@ Authors' Addresses
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 53]
+Rao, et al.                Expires 8 July 2023                 [Page 54]
