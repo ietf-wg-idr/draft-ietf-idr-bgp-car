@@ -1124,8 +1124,11 @@ Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
    Type-Specific Non-Key TLV handling:
  
    *  Either the length of a TLV would cause the NLRI length to be exceeded when 
-      parsing the TLV, or fewer than 2 bytes remain when beginning to parse the TLV. 
-      Type specific length constraints should be verified.  The TLV MUST be
+      parsing the TLV, or fewer than 2 bytes remain when beginning to parse the TLV.
+      In either of these cases, an error condition exists and the "treat-
+      as-withdraw" approach MUST be used.
+      
+   *  Type specific length constraints should be verified.  The TLV MUST be
       discarded if there is an error.
  
    *  If multiple instances of same type are encountered, all but the
