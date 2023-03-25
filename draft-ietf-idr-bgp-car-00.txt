@@ -3082,6 +3082,29 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    *  When a BR in D2 advertises the route to a BR in D3, the same
       process repeats.
+      
+Appendix C.  CAR SAFI NLRI update packing efficiency calculation
+
+   CAR SAFI NLRI encoding is optimized for updating packing i.e. it
+   allows per prefix information (example label index, SRv6 SID) to be
+   carried in non key TLV part of NLRI.  This allows multiple NLRIs to
+   be packed in single update message when other attributes are shared.
+   Example below shows gain convergence time and reduction in total BGP
+   data on the wire.
+
+   Consider 1.5 million routes and average 5 NLRIs sharing attributes:
+
+      Number of update messages:
+         1.5M/5 = 300K update messages instead of 1.5M without packing
+
+      Convergence time presuming 10k updates/second
+         300k/10k = 30 seconds instead of 2.5 minutes without packing
+
+      Reduction of BGP data:
+         Consider, each NLRI size 30 Bytes and 200 bytes of shared attributes
+         Update message size = (30 * 5 NLRIs) + 200 = 350 bytes;
+         Total BGP bytes with packing = 350 * 300k = 105MB
+         Total BGP bytes without packing (200 + 30) * 1.5M = 345MB
 
 Authors' Addresses
 
