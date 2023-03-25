@@ -160,33 +160,34 @@ Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
        |             | insertion (e.g. service chain steering), c/ |
        |             | per-hop behavior (e.g. 5G slice).           |
        +-------------+---------------------------------------------+
+
+
+
+Rao, et al.             Expires 14 September 2023               [Page 3]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
+
+
        +-------------+---------------------------------------------+
        | Color       | A 32-bit numerical value associated with an |
-
-
-
-Rao, et al.                Expires 8 July 2023                  [Page 3]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
-
-
-       |             | intent: e.g. low-cost vs low-delay vs       |
-       |             | avoiding some resources. As defined in RFC9256|
+       |             | intent (e.g. low-cost , low-delay, avoid    |
+       |             | some resources etc.) as defined in          |
+       |             | [RFC9256]                                   |
        +-------------+---------------------------------------------+
        +-------------+---------------------------------------------+
-       | Colored     | An egress PE E2 colors its BGP VPN route V/ |
-       | Service     | v to indicate the intent that it requests   |
-       | Route       | for the traffic bound to V/v.  The color is |
-       |             | encoded as a BGP Color Extended community   |
-       |             | [RFC9012].                                  |
+       | Colored     | An egress PE (e.g.  E2) colors its BGP      |
+       | Service     | service (e.g.  VPN) route V/v to indicate   |
+       | Route       | the intent that it requests for the traffic |
+       |             | bound to V/v.  The color is encoded as a    |
+       |             | BGP Color Extended community [RFC9012].     |
        +-------------+---------------------------------------------+
        +-------------+---------------------------------------------+
        | Color-Aware | A routed path to E2 which satisfies the     |
        | Path to     | intent associated with color C.  Several    |
        | (E2, C)     | technologies may provide a Color-Aware Path |
        |             | to (E2, C): SR Policy [RFC9256], IGP Flex-  |
-       |             | Algo [I-D.ietf-lsr-flex-algo], BGP CAR      |
-       |             | [specified in this document].               |
+       |             | Algo [RFC9350], BGP CAR [specified in this  |
+       |             | document].                                  |
        +-------------+---------------------------------------------+
        +-------------+---------------------------------------------+
        | Color-Aware | A distributed or signaled route that builds |
@@ -197,16 +198,17 @@ Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
        | Service     | E1 automatically steers a C-colored service |
        | Route       | route V/v from E2 onto an (E2, C) path.  If |
        | Automated   | several such paths exist, a preference      |
-       | Steering on | scheme is used to select the best path:     |
-       | Color-aware | E.g.  IGP Flex-Algo first then BGP CAR then |
-       | path        | SR Policy.                                  |
+       | Steering on | scheme is used to select the best path (for |
+       | Color-aware | example, IGP Flex-Algo first then SR Policy |
+       | path        | then BGP CAR.                               |
        +-------------+---------------------------------------------+
        +-------------+---------------------------------------------+
        | Color       | A set of nodes which share the same Color-  |
-       | Domain      | to-Intent mapping.  This set can be         |
-       |             | organized in one or several IGP instances   |
-       |             | or BGP domains.  Color re-mapping may       |
-       |             | happen at color domain boundaries.          |
+       | Domain      | to-Intent mapping, typically under single   |
+       |             | administration.  This set can be organized  |
+       |             | in one or several IGP instances or BGP      |
+       |             | domains.  Color re-mapping may happen at    |
+       |             | color domain boundaries.                    |
        +-------------+---------------------------------------------+
        +-------------+---------------------------------------------+
        | Resolution  | An inter-domain BGP CAR route (E, C) from N |
@@ -214,36 +216,35 @@ Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
        | CAR route   | path (N, C) where N is the next-hop of the  |
        | (E, C)      | BGP CAR route.                              |
        +-------------+---------------------------------------------+
+
+
+
+Rao, et al.             Expires 14 September 2023               [Page 4]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
+
+
        +-------------+---------------------------------------------+
        | Resolution  | In this document and consistently with the  |
        | vs Steering | terminology of the SR Policy document       |
        |             | [RFC9256], steering is used to describe the |
-
-
-
-Rao, et al.                Expires 8 July 2023                  [Page 4]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
-
-
        |             | mapping of a service route onto a BGP CAR   |
        |             | path while the term resolution is preserved |
        |             | for the mapping of an inter-domain BGP CAR  |
        |             | route on an intra-domain color-aware path.  |
        +-------------+---------------------------------------------+
        +-------------+---------------------------------------------+
-       |             | Service Steering: Service route -> BGP CAR  |
-       |             | path (or other Color-Aware Routed Paths:    |
-       |             | e.g.  SR Policy)                            |
+       |             | Service Steering: Service route maps to BGP |
+       |             | CAR path (or other Color-Aware Routed       |
+       |             | Paths: e.g.  SR Policy)                     |
        +-------------+---------------------------------------------+
        +-------------+---------------------------------------------+
-       |             | Intra-Domain Resolution: BGP CAR route ->   |
-       |             | intra-domain color aware path (e.g.  SR     |
+       |             | Intra-Domain Resolution: BGP CAR route maps |
+       |             | to intra-domain color aware path (e.g.  SR  |
        |             | Policy, IGP Flex-Algo, BGP CAR) or          |
        |             | traditional routing/TE path (e.g.  RSVP-TE, |
        |             | IGP/LDP, BGP-LU)                            |
        +-------------+---------------------------------------------+
-
                                   Table 1
 
 1.2.  Illustration
