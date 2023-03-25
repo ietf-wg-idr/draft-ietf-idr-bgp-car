@@ -470,25 +470,38 @@ Internet-Draft        BGP Color-Aware Routing (CAR)         January 2023
 
    *  A BGP color-aware route (E2, C1) from N may be resolved over a
       color-aware route (N, C2): i.e. the local policy maps the
-      resolution of C1 over C2. 
-      
-      - For example, in a domain where resource R is known to not be 
-        present, the inter-domain intent C1="low delay and avoid R" 
-        may be resolved over an intra-domain path of intent C2="low delay". 
+      resolution of C1 over C2.
 
-      - Another example is, if no (N, C1) path is available, and the 
-        user has allowed resolution to fallback via C2.
+      -  For example, in a domain where resource R is known to not be
+         present, the inter-domain intent C1="low delay and avoid R" may
+         be resolved over an intra-domain path of intent C2="low delay".
 
-   *  Resolution may be mapped to traditional mechanisms that are unaware of 
-      color, such as RSVP-TE, IGP/LDP, BGP LU.
+      -  Another example is, if no (N, C1) path is available, and the
+         user has allowed resolution to fallback via C2
 
-   Route resolution via different color may be automated by attaching BGP Color extended
-   Community C2 to CAR route (E2, C1), leveraging Automated Steering as described 
-   in section 8.4 of Segment Routing Policy Architecture [RFC9256].  This mechanism 
-   is illustrated in section B.2.
+   *  Resolution may be mapped to traditional mechanisms that are
+      unaware of color, such as RSVP-TE, IGP/LDP, BGP LU (e.g.,
+      Appendix A.3.2).
 
-   Local policy takes precedence over default color based automated resolution. For a CAR route, 
-   Color-EC color takes precedence over route NLRI color.
+   Route resolution via different color may be automated by attaching
+   BGP Color extended Community C2 to CAR route (E2, C1), leveraging
+   Automated steering as described section 8.4 of Segment Routing Policy
+   Architecture [RFC9256] for BGP CAR routes.  This mechanism is
+   illustrated in section B.2.
+
+
+
+
+
+
+Rao, et al.             Expires 14 September 2023               [Page 9]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
+
+
+   Local policy takes precedence over default color based automated
+   resolution.  For a CAR route, Color-EC color takes precedence over
+   route NLRI color.
 
    The color-aware route (N, C1) may have a different dataplane
    encapsulation than the one of (E2, C1): e.g. a BGP CAR route (E2, C1)
