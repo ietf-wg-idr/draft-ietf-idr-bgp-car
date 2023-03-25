@@ -911,17 +911,17 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    BGP Transport CAR can be also used to setup end-to-end color-aware
    connectivity using Segment Routing over IPv6 (SRv6) [RFC8402].
-   [I-D.ietf-spring-srv6-network-programming] specifies the SRv6
-   Endpoint behaviors (e.g.  End PSP) which MAY be leveraged for BGP CAR
-   with SRv6.The SRv6 SID TLV is used for advertisement of color-aware
-   routes along with their SRv6 SIDs and has the following format:
+   [RFC8986] specifies the SRv6 Endpoint behaviors (e.g.  End PSP) which
+   MAY be leveraged for BGP CAR with SRv6.The SRv6 SID TLV is used for
+   advertisement of color-aware routes along with their SRv6 SIDs and
+   has the following format:
 
 
 
 
-Rao, et al.             Expires 27 February 2023               [Page 16]
+Rao, et al.             Expires 14 September 2023              [Page 17]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
 
 
     0                   1                   2                   3
@@ -943,15 +943,24 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
       -  A single 128-bit SRv6 SID or a stack of 128-bit SRv6 SIDs
 
-      -  A transposed portion (refer [I-D.ietf-bess-srv6-services]) of
-         the SRv6 SID that MUST be of size in multiples of one octet and
-         less than 16.
+      -  A transposed portion (refer [RFC9252]) of the SRv6 SID that
+         MUST be of size in multiples of one octet and less than 16.
+
+   BGP CAR SRv6 SID TLV definitions provide the following benefits:
+
+   *  Native encoding of SIDs avoids robustness issue caused by
+      overloading of MPLS label fields.
+
+   *  Simple encoding to signal Unique SIDs (non-transposition),
+      maintaining BGP update prefix packing
+
+   *  Highly efficient transposition scheme (12-14 bytes saved per
+      NLRI), also maintaining BGP update prefix packing
 
    The BGP color-aware route update for SRv6 MUST include the BGP
    Prefix-SID attribute along with the TLV carrying the SRv6 SID
-   information as specified in [I-D.ietf-bess-srv6-services] when using
-   the transposition scheme of encoding for packing efficiency of BGP
-   updates.
+   information as specified in [RFC9252] when using the transposition
+   scheme of encoding for packing efficiency of BGP updates.
 
 2.9.3.  Local-Color-Mapping (LCM) Extended Community
 
