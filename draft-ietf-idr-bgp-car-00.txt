@@ -235,7 +235,8 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    +-------------+----------------------------------------------------+
    |             | Intra-Domain Resolution: BGP CAR route -> intra-   |
    |             | domain color aware path (e.g.  SR Policy, IGP      |
-   |             | Flex-Algo, BGP CAR)                                |
+   |             | Flex-Algo, BGP CAR) or traditional routing/TE      |
+   |             | path (e.g.  RSVP-TE, IGP/LDP, BGP-LU)              |
    +-------------+----------------------------------------------------+
 
                                  Table 1
@@ -452,24 +453,49 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
 2.5.  BGP CAR Route Resolution
 
-   A BGP color-aware route (E2, C1) from N is resolved over a color-
-   aware route (N, C1).  The color-aware route (N, C1) may be provided
-   recursively by BGP CAR or by other routing solutions: SR Policy, IGP
-   Flex-Algo, RSVP-TE, BGP-LU.
+   A BGP color-aware route (E2, C1) from N is automatically resolved
+   over a color-aware route (N, C1) by default.  The color-aware route
+   (N, C1) is provided by color aware mechanisms such as IGP Flex-Algo,
+   SR policy or recursively by BGP CAR.  When multiple producers of
+   (N,C1) are available, the default preference is: IGP Flex-Algo, SR
+   Policy, BGP CAR.
 
-   When multiple resolutions are possible, the default preference should
-   be: IGP Flex-Algo, SR Policy, RSVP-TE, BGP CAR, BGP LU.
+   Local policy can provide additional control and options:
 
-   Through local policy, a BGP color-aware route (E2, C1) from N may be
-   resolved over a color-aware route (N, C2): i.e. the local policy maps
-   the resolution of C1 over C2.  For example, in a domain where
-   resource R is known to not be present, the inter-domain intent
-   C1="low delay and avoid R" may be resolved over an intra-domain path
-   of intent C2="low delay".  Another example is, if no (N, C1) path is
-   available, and the user has allowed resolution via C2.
+   *  A BGP color-aware route (E2, C1) from N may be resolved over a
+      color-aware route (N, C2): i.e. the local policy maps the
+      resolution of C1 over C2.
 
-   Resolution may also be automated using Color-EC as illustrated in
-   Appendix B.2 .
+      -  For example, in a domain where resource R is known to not be
+         present, the inter-domain intent C1="low delay and avoid R" may
+         be resolved over an intra-domain path of intent C2="low delay".
+
+      -  Another example is, if no (N, C1) path is available, and the
+         user has allowed resolution to fallback via C2
+
+   *  Resolution may be mapped to traditional mechanisms that are
+      unaware of color, such as RSVP-TE, IGP/LDP, BGP LU (e.g.,
+      Appendix A.3.2).
+
+   Route resolution via different color may be automated by attaching
+   BGP Color extended Community C2 to CAR route (E2, C1), leveraging
+   Automated steering as described section 8.4 of Segment Routing Policy
+   Architecture [RFC9256] for BGP CAR routes.  This mechanism is
+   illustrated in section B.2.
+
+
+
+
+
+
+Rao, et al.             Expires 14 September 2023               [Page 9]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
+
+
+   Local policy takes precedence over default color based automated
+   resolution.  For a CAR route, Color-EC color takes precedence over
+   route NLRI color.
 
    The color-aware route (N, C1) may have a different dataplane
    encapsulation than the one of (E2, C1): e.g. a BGP CAR route (E2, C1)
