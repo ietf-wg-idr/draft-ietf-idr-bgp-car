@@ -2778,57 +2778,97 @@ A.7.  Advertising BGP CAR routes for shared IP addresses
 
          Figure 11: BGP CAR advertisements for shared IP addresses
 
-   This example describes a case where the same transport IP address is
-   originated from multiple nodes in different domains.
+   This example describes a case where a route for the same transport IP
+   address is originated from multiple nodes in different network
+   domains.
 
    One use of this scenario is an Anycast transport service, where
-   packet encapsulation may terminate on any one among a set of nodes.
-   All the nodes are capable of forwarding the inner payload, for
-   instance via an IP lookup in the global table.
+   packet encapsulation (e.g., LSP) may terminate on any one among a set
+   of nodes.  All the nodes are capable of forwarding the inner payload,
+   typically via an IP lookup in the global table for Internet routes.
 
    A couple of variations of the use-case are described in the example
    below.
 
    One node is shown in each domain, but there will be multiple nodes in
-   practice.
+   practice for redundancy.
 
    Example-1: Anycast with forwarding to nearest
 
 
 
-
-Rao, et al.             Expires 27 February 2023               [Page 50]
+Rao, et al.             Expires 14 September 2023              [Page 53]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
 
 
-   *  Both E2 and E3 advertise Anycast IP (IP1, C1) with same label L1
+   *  Both E2 and E3 advertise Anycast (shared) IP (IP1, C1) with same
+      label L1
 
-   *  An ingress PE E1 receives by default the best path(s) propagated
-      through BGP hops across the network.
+   *  An ingress PE E1 receives by default the best path(s) for (IP1,
+      C1) propagated through BGP hops across the network.
 
-   *  The paths to (IP1, C1) from E2 and E3 may get merged at a common
-      node along the path to E1.
+   *  The paths to (IP1, C1) from E2 and E3 may merge at a common node
+      along the path to E1, forming equal cost multipaths or active-
+      backup paths at that node
 
-   *  Traffic for colored service routes steered at E1 via (IP1, C1) is
-      forwarded to either E2 or E3 (or both) as determined by the
-      network (nodes in the path).
+   *  Service route V/v is advertised from egress domains D1 and D2 with
+      color C1 and next-hop IP1.
+
+   *  Traffic for V/v steered at E1 via (IP1, C1) is forwarded to either
+      E2 or E3 (or both) as determined by routing along the network
+      (nodes in the path).
 
    Example-2: Anycast with egress domain visibility at ingress PE
 
    *  E2 advertises (IP1, C1) and E3 advertises (IP1, C2) CAR routes for
-      the Anycast IP IP1.
+      the Anycast IP IP1.  C1 and C2 are colors assigned to distinguish
+      the egress domains originating the routes to IP1.
 
    *  An ingress PE E1 receives the best path(s) propagated through BGP
       hops across the network for both (IP1, C1) and (IP1, C2).
 
-   *  The two CAR routes do not get merged at any intermediate node,
-      providing E1 control over path selection and load-balancing of
-      traffic across these routes.
+   *  The CAR routes (IP1, C1) and (IP1, C2) do not get merged at any
+      intermediate node, providing E1 control over path selection and
+      load-balancing of traffic across these two routes.  Each route may
+      itself provide multipathing or Anycast to a set of egress nodes.
+
+   *  Service route V/v advertised from egress domain D1 and D2 with
+      colors C1 and C2 respectively, but with same next-hop IP1.
+
+   *  E1 will resolve and steer V/v path from D1 via (IP1, C1) and path
+      from D2 via (IP2, C2).  E1 will load-balance traffic to V/v across
+      the two paths as determined by a local load-balancing policy.
 
    *  Traffic for colored service routes steered at E1 is forwarded to
       either E2 or E3 (or load-balanced across both) as determined by
       E1.
+
+   In above example, D1 and D2 belonged to the same color or
+   administrative domain.  If D1 and D2 belonged to different color
+   domains, the domains will coordinate the assignment of colors to be
+   used with shared IP IP1 such that they do not cause conflicts.  For
+   instance, in Example-1 :
+
+
+
+
+Rao, et al.             Expires 14 September 2023              [Page 54]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
+
+
+   *  D1 and D2 may both use C1 when they originate CAR route for IP1.
+
+      -  In this case, naturally neither D1 nor D2 will use C1 for some
+         other intent
+
+   *  Alternatively, D1 may use C2 and D2 may use C3 for originating a
+      CAR route for IP1 for the same intent.
+
+      -  In this case, D1 will not use C3 for originating CAR route for
+         IP1 for some other intent.  Similarly, D2 will not use C2 for
+         originating CAR route for IP1 for some other intent.
 
 Appendix B.  Color Mapping Illustrations
 
