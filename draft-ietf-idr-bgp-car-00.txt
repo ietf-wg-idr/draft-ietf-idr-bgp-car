@@ -1899,11 +1899,23 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    and non-conflicting color allocation across the different network
    domains in that color domain.
 
-   If networks under different administrative control establish a shared
-   transport service between them, where the same transport IP address
-   is co-ordinated and shared across the two networks, then the color
-   assignments associated with that IP address should also be co-
+   When color-aware routes propagate across a color domain boundary,
+   there is typically no need for coordinating color assignments, since
+   the IP prefix is unique, and hence makes the color scope also unique
+   and non-conflicting.  The color only needs to be re-mapped into a
+   local color assigned for the same intent (which is carried in the
+   LCM-EC).
+
+   However, if networks under different administrative control establish
+   a shared transport service between them, where the same transport IP
+   address is co-ordinated and shared across the two networks, then the
+   color assignments associated with that IP address should also be co-
    ordinated to avoid any conflicts in either network.
+
+   It should be noted that the color assignments coordination are only
+   necessary for routes to the shared service IP.  Colors used for
+   intra-domain or for inter-domain intents associated with the unique
+   IP addresses do not need any coordination.
 
 11.  Co-authors
 
