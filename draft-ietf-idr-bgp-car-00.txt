@@ -985,19 +985,69 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    *  Color: 4-octet field that carries the 32-bit color value.
 
-   When a CAR route crosses the originator color domain's boundary, LCM
-   EC is added.  LCM EC conveys the local color mapping for the intent
-   (e.g. low latency) into transit or remote color domains.
+   When a CAR route crosses the originator's color domain boundary, LCM-
+   EC is added.  LCM-EC conveys the local color mapping for the intent
+   (e.g. low latency) in other (transit or destination) color domains.
 
-   An implementation SHOULD NOT send more than one instance of the LCM
+   An implementation SHOULD NOT send more than one instance of the LCM-
    EC.  However, if more than one instance is received, an
    implementation MUST disregard all instances other than the one with
    the numerically highest value.
 
-   The LCM EC MAY be used for filtering of BGP CAR routes and/or for
+   If present, LCM-EC is the effective intent of a BGP CAR route.
+
+   LCM-EC Color is used instead of the Color in CAR route NLRI for
+   procedures described in earlier sections such as route validation,
+   resolution, AIGP calculation and steering.
+
+   The LCM-EC MAY be used for filtering of BGP CAR routes and/or for
    applying routing policies for the intent, when present.
 
-2.10.  Error Handling
+2.10.  LCM and BGP Color Extended Community usage
+
+   There are 2 distinct requirements to be supported as stated in
+   [I-D.hr-spring-intentaware-routing-using-color]":
+
+   1.  Domains with different intent granularity (section 6.3.1.9)
+
+   2.  Network domains under different administration, i.e. color
+       domains (section 4.1)
+
+
+
+
+
+Rao, et al.             Expires 14 September 2023              [Page 19]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
+
+
+   Requirement 1 is the case where within the same administrative or
+   color domain, BGP CAR routes for N end-to-end intents may need to
+   traverse across an intermediate domain where only M intents are
+   available, N >= M.  Example: a multi-domain network is designed as
+   Access-Core-Access.  The core may have the most granular N intents,
+   whereas the access only has fewer M intents.  So, the BGP nexthop
+   resolution for a CAR route in the access domain must be via a color-
+   aware path for one of these M intents.  As described in Section 2.5
+   and Appendix B.2, BGP Color Extended Community is used to automate
+   the CAR route resolution.
+
+   For requirement 2, where CAR routes traverse across different color
+   domains, LCM-EC is used to carry the local color mapping for the NLRI
+   color in other color domains as already described in Section 2.8 and
+   Appendix.B.3
+
+   Both LCM-EC and BGP Color Extended Community may be present with a BGP
+   CAR route.  Example: BGP CAR route (E, C1) from color domain D1, with
+   LCM-EC C2 in color domain D2, may also carry Color-EC C3 and next-hop
+   N in a transit network domain within D2 that has intent C3 available
+   and resolves C2 via C3.
+
+   Default order of processing for resolution in presence of LCM-EC is
+   local policy, then BGP Color-EC color, and finally LCM-EC color.
+
+2.11.  Error Handling
 
    The error handling actions as described in [RFC7606] are applicable
    for handling of BGP update messages for BGP-CAR.
