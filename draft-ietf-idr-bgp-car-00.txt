@@ -667,6 +667,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    in an opaque manner for handling of unknown or unsupported NLRI
    types.  This can help deployed Route Reflectors (RR) to propagate
    NLRI types introduced in the future in a transparent manner.
+   
+   It also helps make error handling more resilient and minimally
+   disruptive as described in section Section 2.11.
 
    A route (NLRI) can carry more than one non-key TLV (of different
    types).  This provides significant benefits such as signaling
@@ -674,11 +677,12 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    a different value (label/SID etc).  This enables simpler, efficient
    migrations with low overhead :
 
-   *  avoids duplicate routes to signal different encapsulations
+   *  avoids need for duplicate routes to signal different
+      encapsulations
 
    *  avoids need for separate control planes for distribution
 
-   *  preserves update packing
+   *  preserves update packing (e.g.  Appendix C)
 
    The non-key portion of the NLRI MUST be omitted while carrying it
    within the MP_UNREACH_NLRI when withdrawing the route advertisement.
@@ -1059,7 +1063,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
 2.11.  Error Handling
 
    The error handling actions as described in [RFC7606] are applicable
-   for handling of BGP update messages for BGP-CAR.
+   for handling of BGP update messages for BGP-CAR.  In general, as
+   indicated in [RFC7606], the goal is to minimize the disruption of a
+   session reset or 'AFI/SAFI disable' to the extent possible.
 
    When the error determined allows for the router to skip the malformed
    NLRI(s) and continue processing of the rest of the update message,
@@ -1071,53 +1077,90 @@ Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
    Alternately, the router MUST perform 'session reset' when the session
    is only being used for BGP-CAR.
 
-   Following errors result in 'AFI/SAFI disable' or 'session reset':
-
-   *  Minimum NLRI length check error.
-
-   *  NLRI length conflict with key length.
-
-   *  Key length encoding errors (such as minimum, maximum and conflict
-      with prefix length).
-
-   There can be cases where the NLRI length value is in conflict with
-   the enclosed non-key TLVs, which themselves carry length values.
-   Either the length of a TLV would cause the NLRI length to be exceeded
-   when parsing the TLV, or fewer than 2 bytes remain when beginning to
-   parse the TLV.
+   The CAR NLRI definition encodes NLRI length and key length
+   explicitly.  The NLRI length MUST be relied upon to enable the
+   beginning of the next NLRI field to be located.  Key length MUST be
+   relied upon to extract the key and perform 'treat-as-withdraw' for
+   malformed information.
 
 
 
 
-
-Rao, et al.             Expires 27 February 2023               [Page 18]
+Rao, et al.             Expires 14 September 2023              [Page 20]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
 
 
-   In either of these cases, an error condition exists and the "treat-
-   as-withdraw" approach MUST be used (unless some other, more severe
-   error is encountered dictating a stronger approach), and the NLRI
-   Length MUST be relied upon to enable the beginning of the next NLRI
-   field to be located.  The above recommendations follow the principle
-   defined in section 4 of [RFC7606].
+   A sender MUST ensure that the NLRI and key lengths are number of
+   actual bytes encoded in NLRI and key fields respectively, regardless
+   of content being encoded.
 
-   Type-Specific Non-Key TLV handling
+   Given NLRI length and Key length MUST be valid, failures in following
+   checks result in 'AFI/SAFI disable' or 'session reset':
+
+   *  Minimum NLRI length (must be atleast 2, as key length and NLRI
+      type are required fields)
+
+   *  Key Length MUST be at least two less than NLRI Length
+
+   NLRI Type specific error handling:
+
+   *  By default, a speaker SHOULD discard unrecognized or unsupported
+      NLRI type and move to next NLRI.
+
+   *  Key length and key errors of known NLRI type SHOULD result in
+      discard of NLRI similar to unrecognized NLRI type.(This MUST be
+      logged for trouble shooting).
+
+   Transparent propagation of unrecognized NLRI type:
+
+   *  Key length allows unrecognized route types to transit through RR
+      transparently without a software upgrade.  Such RR does not need
+      to interpret key portion of NLRI and works on opaque key of given
+      length.  An implementation SHOULD provide a knob that controls the
+      RR unrecognized route type propagation behavior and possibly at
+      granularity of route type values allowed.  This gives ability to
+      operator to allow specific route type transparent reflection based
+      on client speaker support.
+
+   *  In such a case RR may reflect NLRIs with NLRI type specific key
+      length and field errors.  Clients of such RR that consume the
+      route for installation will perform the key error handling of
+      known NLRI type or discard unrecognized type.  This prevents
+      propagation of routes with NLRI errors any further in network.
+
+   Type-Specific Non-Key TLV handling:
+
+   *  Either the length of a TLV would cause the NLRI length to be
+      exceeded when parsing the TLV, or fewer than 2 bytes remain when
+      beginning to parse the TLV.  In either of these cases, an error
+      condition exists and the 'treat-as-withdraw' approach MUST be used
+
+   *  Type specific length constraints should be verified.  The TLV MUST
+      be discarded if there is an error.
+
+
+
+
+Rao, et al.             Expires 14 September 2023              [Page 21]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
+
 
    *  If multiple instances of same type are encountered, all but the
       first instance MUST be ignored.
 
-   *  Type specific length constraints should be verified.  The TLV is
-      discarded if there is an error.
+   *  If multiple instances of same type are encountered, all but the
+      first instance MUST be ignored.
 
    *  A TLV is not considered malformed because of failing any semantic
       validation of its Value field.
 
    *  Speaker modifying the BGP next-hop MUST recognize at least one of
-      the forwarding information TLV (such as label and SRv6 SID).  If
+      the forwarding information TLVs (such as label and SRv6 SID).  If
       it is not able to, such NLRI is considered invalid and not
       eligible for best path selection.
-
+      
 3.  Service route Automated Steering on Color-Aware path
 
    E1 automatically steers a C-colored service route V/v from E2 onto an
