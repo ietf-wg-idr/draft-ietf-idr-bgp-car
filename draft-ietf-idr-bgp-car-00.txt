@@ -516,9 +516,9 @@ Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
    domain mechanism can also be set.
 
    If BGP CAR routes traverse across a discontinuity in the transport
-   path for a given intent, add a penalty in accumulated IGP metric.
-   The discontinuity is also indicated to upstream nodes via a bit in
-   the AIGP TLV.
+   path for a given intent, add a penalty in accumulated IGP metric
+   (value by user policy).  For instance, when color C1 path is not
+   available, and route resolves via color C2 path (e.g., Appendix A.3).
 
    AIGP metric computation is recursive.
 
@@ -538,7 +538,8 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    Additional AIGP extensions may be defined to signal state for
    specific use-cases: MSD along the BGP CAR advertisement, Minimum MTU
-   along the BGP CAR advertisement.
+   along the BGP CAR advertisement. This is out of scope for this	
+ 	 document.
 
 2.7.  Path Availability
 
