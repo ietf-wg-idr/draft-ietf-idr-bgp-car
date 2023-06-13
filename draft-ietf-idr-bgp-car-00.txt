@@ -152,11 +152,13 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    +=============+====================================================+
    +=============+====================================================+
-   | Intent      | Any combination of the following behaviors: a/     |
-   |             | Topology path selection (e.g. minimize metric,     |
+   | Intent (in  | Any combination of the following behaviors: a/     |
+   | routing)    | Topology path selection (e.g. minimize metric,     |
    |             | avoid resource), b/ NFV service insertion (e.g.    |
-   |             | service chain steering), c/ per-hop behavior (e.g. |
-   |             | 5G slice).                                         |
+   |             | service chain steering), c/ per-hop behavior       |
+   |             | (e.g. 5G slice).  More specific concept w.r.t.     |
+   |             | routing beyond best-effort, compared to intent     |
+   |             | as declarative abstraction in [RFC9315]            |
    +-------------+----------------------------------------------------+
    +-------------+----------------------------------------------------+
    | Color       | A 32-bit numerical value associated with an        |
@@ -2243,6 +2245,11 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
               "Advertisement of Multiple Paths in BGP", RFC 7911,
               DOI 10.17487/RFC7911, July 2016,
               <https://www.rfc-editor.org/info/rfc7911>.
+              
+   [RFC9315]  Clemm, A., Ciavaglia, L., Granville, L. Z., and J.	
+              Tantsura, "Intent-Based Networking - Concepts and	
+ 	            Definitions", RFC 9315, DOI 10.17487/RFC9315, October	
+ 	            2022, <https://www.rfc-editor.org/info/rfc9315>.
 
 Appendix A.  Illustrations of Service Steering
 
@@ -2943,8 +2950,8 @@ Rao, et al.             Expires 14 September 2023              [Page 53]
 Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
 
 
-   *  Both E2 and E3 advertise Anycast (shared) IP (IP1, C1) with same
-      label L1
+   *  Both E2 (in egress domain 2) and E3 (in egress domain 3) advertise
+      Anycast (shared) IP (IP1, C1) with same label L1
 
    *  An ingress PE E1 receives by default the best path(s) for (IP1,
       C1) propagated through BGP hops across the network.
@@ -2953,7 +2960,7 @@ Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
       along the path to E1, forming equal cost multipaths or active-
       backup paths at that node
 
-   *  Service route V/v is advertised from egress domains D1 and D2 with
+   *  Service route V/v is advertised from egress domains D2 and D3 with
       color C1 and next-hop IP1.
 
    *  Traffic for V/v steered at E1 via (IP1, C1) is forwarded to either
@@ -2974,23 +2981,22 @@ Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
       load-balancing of traffic across these two routes.  Each route may
       itself provide multipathing or Anycast to a set of egress nodes.
 
-   *  Service route V/v advertised from egress domain D1 and D2 with
+   *  Service route V/v advertised from egress domain D2 and D3 with
       colors C1 and C2 respectively, but with same next-hop IP1.
 
-   *  E1 will resolve and steer V/v path from D1 via (IP1, C1) and path
-      from D2 via (IP2, C2).  E1 will load-balance traffic to V/v across
+   *  E1 will resolve and steer V/v path from D2 via (IP1, C1) and path
+      from D3 via (IP2, C2).  E1 will load-balance traffic to V/v across
       the two paths as determined by a local load-balancing policy.
 
    *  Traffic for colored service routes steered at E1 is forwarded to
       either E2 or E3 (or load-balanced across both) as determined by
       E1.
 
-   In above example, D1 and D2 belonged to the same color or
-   administrative domain.  If D1 and D2 belonged to different color
+   In above example, D2 and D3 belonged to the same color or
+   administrative domain.  If D2 and D3 belonged to different color
    domains, the domains will coordinate the assignment of colors to be
    used with shared IP IP1 such that they do not cause conflicts.  For
    instance, in Example-1 :
-
 
 
 
@@ -2999,16 +3005,16 @@ Rao, et al.             Expires 14 September 2023              [Page 54]
 Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
 
 
-   *  D1 and D2 may both use C1 when they originate CAR route for IP1.
+   *  D2 and D3 may both use C1 when they originate CAR route for IP1.
 
-      -  In this case, naturally neither D1 nor D2 will use C1 for some
-         other intent
+      -  In this case, neither D2 nor D3 will reuse C1 for some other
+         intent
 
-   *  Alternatively, D1 may use C2 and D2 may use C3 for originating a
+   *  Alternatively, D2 may use C2 and D3 may use C3 for originating a
       CAR route for IP1 for the same intent.
 
-      -  In this case, D1 will not use C3 for originating CAR route for
-         IP1 for some other intent.  Similarly, D2 will not use C2 for
+      -  In this case, D2 will not use C3 for originating CAR route for
+         IP1 for some other intent.  Similarly, D3 will not use C2 for
          originating CAR route for IP1 for some other intent.
 
 Appendix B.  Color Mapping Illustrations
