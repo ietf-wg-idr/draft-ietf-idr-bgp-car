@@ -2567,7 +2567,7 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
          next-hop over IGP base algo 0 in right access domain.  BGP CAR
          label swap entry is installed that goes over algo 0 LSP to
          next-hop.  Update AIGP metric to reflect algo 0 metric to next-
-         hop with an additional penalty.
+         hop with an additional penalty (+1000).
 
       -  Local policy on 121 and 122 maps intent C1 to resolve CAR route
          next-hop learnt from Core domain over IGP FA 128.  BGP CAR
@@ -2684,7 +2684,7 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
          next-hop over best effort LDP LSP in access domain 1.  BGP CAR
          label swap entry is installed that goes over LDP LSP to next-
          hop.  AIGP metric is updated to reflect best effort metric to
-         next- hop with an additional penalty.
+         next- hop with an additional penalty (+1000).
 
       -  Local policy on 121 and 122 maps intent C1 to resolve CAR route
          next-hop in Core domain over TE tunnels.  BGP CAR label swap
