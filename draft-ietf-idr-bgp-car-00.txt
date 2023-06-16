@@ -3144,17 +3144,57 @@ Appendix C.  CAR SAFI NLRI update packing efficiency calculation
 
    Consider 1.5 million routes and average 5 NLRIs sharing attributes:
 
-      Number of update messages:
-         1.5M/5 = 300K update messages instead of 1.5M without packing
+        Number of update messages:
+           1.5M/5 = 300K update messages instead of 1.5M without packing
 
-      Convergence time presuming 10k updates/second
-         300k/10k = 30 seconds instead of 2.5 minutes without packing
+        Convergence time presuming 10k updates/second
+           300k/10k = 30 seconds instead of 2.5 minutes without packing
 
-      Reduction of BGP data:
-         Consider, each NLRI size 30 Bytes and 200 bytes of shared attributes
+   Analysis of BGP data exchanged for MPLS (with label-index) and SRv6
+
+Rao, et al.             Expires 27 February 2023               [Page 52]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+
+
+
+
+      Case 1: Label tlv and Label Index tlv
+         Consider 200 bytes of shared attributes
+         Each NLRI size for AFI 1 = 12(key) + 5(label) + 9(Index) = 26 bytes
+         Update message size = (26 * 5 NLRIs) + 200 = 330 bytes;
+         Total BGP bytes with packing = 330 * 300k = 99MB
+         Total BGP bytes without packing (200 + 26) * 1.5M = 339MB
+
+      Case 2: Single 128-bit SRv6 SID tlv
+         Consider 200 bytes of shared attributes
+         Each NLRI size for AFI 1 = 12(key) + 18(SRv6 SID) = 30 bytes
          Update message size = (30 * 5 NLRIs) + 200 = 350 bytes;
          Total BGP bytes with packing = 350 * 300k = 105MB
          Total BGP bytes without packing (200 + 30) * 1.5M = 345MB
+
+      Case 3: Transposed SRv6 SID tlv
+      16 bytes SRv6 SID has locator part and function part. 4 bytes function part is
+      unique per NLRI and hence transposed into 4 byte SRv6 SID TLV and rest carried in
+      prefix SID attribute as per RFC 9252 section 3.2.1 and 4
+         Consider 200 bytes of shared attributes
+         Each NLRI size for AFI 1 = 12(key) + 6(function part of SRv6 SID) = 18 bytes
+         Update message size = (18 * 5 NLRIs) + 200 = 290 bytes;
+         Total BGP bytes with packing = 290 * 300k = 87MB
+
+Summary,
+---------------------------------------------------------------------------------------
+Encoding     |        BGP CAR      |    RFC-8277 NLRI    |        Result
+-------------+---------------------+---------------------+-----------------------------
+MPLS &       |        99MB         |       339MB         | 350% reduction
+Label-index  |   Update packing    |  Update packing     | in BGP data for CAR encoding
+             |   supported         |  not possible       |
+-------------+---------------------+---------------------+-----------------------------
+SRv6 SID     |       105MB         |       345MB         | BGP data inline to MPLS
+             |   Update packing    |  Update packing     | for BGP CAR encoding unlike
+             |   supported         |  not possible       | 8277 NLRI. Transposition saves
+             |                     |                     | further 20% BGP data
+-------------+---------------------+---------------------+-----------------------------
 
 Authors' Addresses
 
