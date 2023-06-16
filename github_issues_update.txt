@@ -1,0 +1,67 @@
+F3-CAR-Issue-1: BGP-CAR Appendix A.7 Anycast EP Scenario
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/1
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/d3169c4d43b74cd46f8adda0065ade8606d6bbb1
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/128061677413660c4c562791fb4c6ed684f22ba0
+ 
+F3-CAR-Issue-2: Terminology, concepts, CAR next-hop resolution
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/2
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/dd89d5638eef7534c7fb8a4096f7885585e8330d
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/ba88ab22818d40a7c5ef40ca7a6aaae24ea9fd57
+
+F3-CAR-Issue-3: LCM and Color Extended Communities
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/3
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/30067cc68472a9836e9f63a9686a6fde01b44920
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/8311eb234bb92047883e17046554888f3ee010d4
+
+
+F3-CAR-Issue-4: CAR Routing in Non-Agreeing Color domains for Anycast EPs
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/4
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/e78ba1a119204dd4fbb9e2fdad2625bcf45a7869
+ 
+F3-CAR-Issue-5: BGP update packing
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/5 
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/64ea1f26b5452d7895e272f2129da6a2c754d497
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/d2c518a745514f51dd58e9249e5ac9b719e2e1bf
+
+F3-WG-Issue-1: Incremental deployment 
+Details:https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/6
+Relevant section: https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#appendix-A.4
+
+F3-WG-Issue-3: Operational differences
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/8
+Relevant sections:
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-2.5 
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#appendix-A.7
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-2.10
+
+F3-WG-Issue-4: service layer intent vs transport layer intent
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/9 
+Relevant draft sections:
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-3
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-8
+
+F3-WG-Issue-5: Technology BGP-CT and CAR are based [upon] and implications
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/10
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/276b13bc180fac4b4a708bd14b45198770a5c44a
+ 
+F3-WG-Issue-6: Benefits of Route Targets
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/11
+Relevant sections:
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-2.8
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-2.9.3
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#appendix-B.3
+
+
+F3-WG-Issue-7: SR-Policy compatibility
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/12
+Relevant draft sections:
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-1.2 
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-3
+
+F3-WG-Issue-8: Scaling and route size
+Details: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/issues/13
+Relevant draft sections:
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#section-6
+https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-car#appendix-C
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/ba5f7e02bacaa84a776cdb502a93e3a6368f9f9e
+Diffs: https://github.com/ietf-wg-idr/draft-ietf-idr-bgp-car/commit/d2c518a745514f51dd58e9249e5ac9b719e2e1bf
