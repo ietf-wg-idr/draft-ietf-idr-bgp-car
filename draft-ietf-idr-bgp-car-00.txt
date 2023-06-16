@@ -1054,7 +1054,7 @@ Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
    Appendix.B.3
 
    Both LCM-EC and BGP Color Extended Community may be present at the
-   time with BGP CAR route.  Example: BGP CAR route (E, C1) from color
+   same time with BGP CAR route.  Example: BGP CAR route (E, C1) from color
    domain D1, with LCM-EC C2 in color domain D2, may also carry Color-EC
    C3 and next-hop N in a transit network domain within D2 where C2 is
    being resolved via an available intra-domain intent C3 (Appendix B.2
