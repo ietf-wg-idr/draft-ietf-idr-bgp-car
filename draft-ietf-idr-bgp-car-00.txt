@@ -2739,7 +2739,7 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    *  BR1 and BR4 also form direct BGP-LU sessions to BR2 and BR3
       respectively, to establish labeled paths between each other
-      through the BGP-LU network
+      through the BGP-LU network. The sessions may be eBGP or iBGP.
 
    *  BR1 recursively resolves the BGP CAR next-hop for CAR routes
       learnt from BR4 via the BGP-LU path to BR4
