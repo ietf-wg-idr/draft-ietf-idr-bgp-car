@@ -3135,66 +3135,170 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
       
 Appendix C.  CAR SAFI NLRI update packing efficiency calculation
 
-   CAR SAFI NLRI encoding is optimized for updating packing i.e. it
-   allows per prefix information (example label index, SRv6 SID) to be
-   carried in non key TLV part of NLRI.  This allows multiple NLRIs to
+   CAR SAFI NLRI encoding is optimized for update packing.  It allows
+   per route information (example label, label index and SRv6 SID) to be
+   carried in non-key TLV part of NLRI.  This allows multiple NLRIs to
    be packed in single update message when other attributes are shared.
-   Example below shows gain convergence time and reduction in total BGP
-   data on the wire.
+   Analysis below shows comparison of total BGP data on the wire for CAR
+   SAFI and [RFC8277] style encoding in MPLS label, SR extension with
+   MPLS (per-prefix label-index in Prefix-SID attribute) [RFC8669] and
+   SRv6 SID cases.  Scenarios considered are ideal packing (maximum
+   number of routes packed to update message limit of 4k bytes, not
+   realistic), practical deployment case with average packing (5 routes
+   share set of BGP path attributes and hence packed in single update
+   message) and worst-case of no packing (each route in separate update
+   message).
 
-   Consider 1.5 million routes and average 5 NLRIs sharing attributes:
+   Summary of ideal, practical and no-packing BGP data in each case
 
-        Number of update messages:
-           1.5M/5 = 300K update messages instead of 1.5M without packing
-
-        Convergence time presuming 10k updates/second
-           300k/10k = 30 seconds instead of 2.5 minutes without packing
-
-   Analysis of BGP data exchanged for MPLS (with label-index) and SRv6
-
-Rao, et al.             Expires 27 February 2023               [Page 52]
+Rao, et al.             Expires 23 December 2023               [Page 72]
 
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
+Internet-Draft        BGP Color-Aware Routing (CAR)            June 2023
 
 
+Encoding     |        BGP CAR      |    RFC-8277 NLRI    |  Result
+-------------+---------------------+---------------------+-----------------------------
+Label        |                     |                     |
+     (Ideal) |       27.5 MB       |      26 MB          |
+             +---------------------+---------------------+  No degradation from
+  (Practical)|       86 MB         |      84 MB          |  8277 like encoding
+             +---------------------+---------------------+
+(No packing) |      325 MB         |     324 MB          |
+-------------+---------------------+---------------------+-----------------------------
+Label &      |                     |     339 MB          | CAR SAFI encoding reduces
+Label-index  |                     | Encoding precludes  | 800% in best case and 350%
+     (Ideal) |       42 MB         | packing             | in average case over
+             +---------------------+---------------------+ 8277 style encoding
+  (Practical)|       99 MB         |     339 MB          |
+             +---------------------+---------------------+
+(No packing) |      339 MB         |     339 MB          |
+-------------+---------------------+---------------------+-----------------------------
+SRv6 SID     |                     |     378 MB          | results are similar to SR MPLS.
+    (Ideal)  |       49 MB         | Encoding precludes  | Transposition further
+             |                     | packing             |
+             +---------------------+---------------------+ reduces 20% BGP data
+ (Practical) |      115 MB         |     378 MB          |
+             |                     |                     |
+             +---------------------+---------------------+
+(No packing) |      378 MB         |     378 MB          |
+-------------+---------------------+---------------------+-----------------------------
 
 
-      Case 1: Label tlv and Label Index tlv
-         Consider 200 bytes of shared attributes
+   Analysis considers 1.5 million routes (5 colors across 300k
+   endpoints)
+
+   BGP data exchanged for non SR MPLS case
+
+Rao, et al.             Expires 23 December 2023               [Page 73]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)            June 2023
+
+
+      Consider 200 bytes of shared attributes
+      CAR SAFI signal Label in non-key TLV part of NLRI
+         Each NLRI size for AFI 1 = 12(key) + 5(label) = 17 bytes
+           Ideal packing:
+            number of NLRIs in 4k update size = 223 (4k-200/17)
+            number of update messages of 4k size = 1.5 million/223 = 6726
+            Total BGP data on wire = 6726 * 4k = ~27.5MB
+           Practical packing (5 routes in update message)
+            size of update message = (17 * 5) + 200 = 285
+            Total BGP data on wire = 285 * 300k = ~86MB
+           No-packing case (1 route per update message)
+            size of update message = 17 + 200 = 217
+            Total BGP data on wire = 217 * 1.5 million = ~325MB
+      SAFI 128 8277 style encoding with label in NLRI
+         Each NLRI size for AFI 1 = 13(key) + 3(label) = 16 bytes
+           Ideal packing:
+            number of NLRIs in 4k update size = 237 (4k-200/16)
+            number of update messages of 4k size = 1.5 million/237 = ~6330
+            Total BGP data on wire = 6330 * 4k = ~25.9MB
+           Practical packing (5 routes in update message)
+            size of update message = (16 * 5) + 200 = 280
+            Total BGP data on wire = 280 * 300k = ~84MB
+           No-packing case (1 route per update message)
+            size of update message = 16 + 200 = 216
+            Total BGP data on wire = 216 * 1.5 million = ~324MB
+
+   BGP data exchanged for SR label-index
+
+Rao, et al.             Expires 23 December 2023               [Page 74]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)            June 2023
+
+
+      Consider 200 bytes of shared attributes
+      CAR SAFI signal Label in non-key TLV part of NLRI
          Each NLRI size for AFI 1 = 12(key) + 5(label) + 9(Index) = 26 bytes
-         Update message size = (26 * 5 NLRIs) + 200 = 330 bytes;
-         Total BGP bytes with packing = 330 * 300k = 99MB
-         Total BGP bytes without packing (200 + 26) * 1.5M = 339MB
+           Ideal packing:
+            number of NLRIs in 4k update size = 146 (4k-200/26)
+            number of update messages of 4k size = 1.5 million/146 = 6726
+            Total BGP data on wire = 10274 * 4k = ~42MB
+           Practical packing (5 routes in update message)
+            size of update message = (26 * 5) + 200 = 330
+            Total BGP data on wire = 330 * 300k = ~99MB
+           No-packing case (1 route per update message)
+            size of update message = 26 + 200 = 226
+            Total BGP data on wire = 226 * 1.5 million = ~339MB
+      SAFI 128 8277 style encoding with label in NLRI
+         Each NLRI size for AFI 1 = 13(key) + 3(label) = 16 bytes
+           Ideal packing
+            Not supported as label index is encoded in prefix SID attribute
+           Practical packing (5 routes in update message)
+            Not supported as label index is encoded in prefix SID attribute
+           No-packing case (1 route per update message)
+            size of update message = 16 + 210 = 226
+            Total BGP data on wire = 216 * 1.5 million = ~339MB
 
-      Case 2: Single 128-bit SRv6 SID tlv
-         Consider 200 bytes of shared attributes
-         Each NLRI size for AFI 1 = 12(key) + 18(SRv6 SID) = 30 bytes
-         Update message size = (30 * 5 NLRIs) + 200 = 350 bytes;
-         Total BGP bytes with packing = 350 * 300k = 105MB
-         Total BGP bytes without packing (200 + 30) * 1.5M = 345MB
+   BGP data exchanged with 128 bit single SRv6 SID
 
-      Case 3: Transposed SRv6 SID tlv
-      16 bytes SRv6 SID has locator part and function part. 4 bytes function part is
-      unique per NLRI and hence transposed into 4 byte SRv6 SID TLV and rest carried in
-      prefix SID attribute as per RFC 9252 section 3.2.1 and 4
-         Consider 200 bytes of shared attributes
-         Each NLRI size for AFI 1 = 12(key) + 6(function part of SRv6 SID) = 18 bytes
-         Update message size = (18 * 5 NLRIs) + 200 = 290 bytes;
-         Total BGP bytes with packing = 290 * 300k = 87MB
+      Consider 200 bytes of shared attributes
+      CAR SAFI signal Label in non-key TLV part of NLRI
+         Each NLRI size for AFI 1 = 12(key) + 18(Srv6 SID) = 30 bytes
+           Ideal packing:
+            number of NLRIs in 4k update size = 126 (4k-200/30)
+            number of update messages of 4k size = 1.5 million/126 = ~12k
+            Total BGP data on wire = 12k * 4k = ~49MB
+           Practical packing (5 routes in update message)
+            size of update message = (30 * 5) + 236 (including prefix SID) = 386
+            Total BGP data on wire = 386 * 300k = ~115MB
+           No-packing case (1 route per update message)
+            size of update message = 12 + 236 (SID in prefixSID) = 252
+            Total BGP data on wire = 252 * 1.5 million = ~378MB
+      SAFI 128 8277 style encoding with label in NLRI (No transposition)
+         Each NLRI size for AFI 1 = 13(key) + 3(label) = 16 bytes
+           Ideal packing
+            Not supported as label index is encoded in prefix SID attribute
+           Practical packing (5 routes in update message)
+            Not supported as label index is encoded in prefix SID attribute
+           No-packing case (1 route per update message)
+            size of update message = 16 + 236 = 252
+            Total BGP data on wire = 252 * 1.5 million = ~378MB
 
-Summary,
----------------------------------------------------------------------------------------
-Encoding     |        BGP CAR      |    RFC-8277 NLRI    |        Result
--------------+---------------------+---------------------+-----------------------------
-MPLS &       |        99MB         |       339MB         | 350% reduction
-Label-index  |   Update packing    |  Update packing     | in BGP data for CAR encoding
-             |   supported         |  not possible       |
--------------+---------------------+---------------------+-----------------------------
-SRv6 SID     |       105MB         |       345MB         | BGP data inline to MPLS
-             |   Update packing    |  Update packing     | for BGP CAR encoding unlike
-             |   supported         |  not possible       | 8277 NLRI. Transposition saves
-             |                     |                     | further 20% BGP data
--------------+---------------------+---------------------+-----------------------------
+
+
+
+Rao, et al.             Expires 23 December 2023               [Page 75]
+
+Internet-Draft        BGP Color-Aware Routing (CAR)            June 2023
+
+
+   BGP data exchanged with SRv6 SID 4 bytes transposition into SRv6 SID
+   TLV
+
+      Consider 200 bytes of shared attributes
+      CAR SAFI signal Label in non-key TLV part of NLRI
+         Each NLRI size for AFI 1 = 12(key) + 6(Srv6 SID) = 18 bytes
+           Ideal packing:
+            number of NLRIs in 4k update size = 211 (4k-200/18)
+            number of update messages of 4k size = 1.5 million/211 = ~7110
+            Total BGP data on wire = 7110 * 4k = ~29MB
+           Practical packing (5 routes in update message)
+            size of update message = (18 * 5) + 236 (including prefix SID) = 326
+            Total BGP data on wire = 326 * 300k = ~98MB
+           No-packing case (1 route per update message)
+            size of update message = 12 + 236 (SID in prefix SID attribute) = 252
+            Total BGP data on wire = 252 * 1.5 million = ~378MB
 
 Authors' Addresses
 
