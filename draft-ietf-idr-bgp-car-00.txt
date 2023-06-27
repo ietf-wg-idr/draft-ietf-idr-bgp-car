@@ -504,6 +504,17 @@ Internet-Draft        BGP Color-Aware Routing (CAR)           March 2023
    with SR-MPLS encapsulation may be transported over an intermediate
    SRv6 domain.
 
+
+   A BGP CAR route may recursively resolve over a BGP route carrying
+   Tunnel Encapsulation attribute.  Procedures of section 8 of [RFC9012]
+   applies in presence of BGP Color EC in the CAR route.  They are
+   extended to use LCM EC and Color in CAR route NLRI as per above and
+   Section 2.9.3 in absence of BGP Color EC.
+
+   Among other options, a BGP CAR BR may advertise a CAR route to an
+   ingress BR with a specific BGP NH per color, with a TEA or Tunnel
+   Encapsulation EC.
+
 2.6.  AIGP Metric Computation
 
    The Accumulated IGP (AIGP) Attribute is updated as the BGP CAR route
@@ -1230,12 +1241,20 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    Future revisions of this document will analyze the BGP CAR supports
    for 3, 5 and 6.
 
-5.  (E, C) Subscription and Filtering
+5.  Filtering
 
-   This section defines an (E, C) BGP subscription model that allows to
-   filter the (E, C) routes learned by a BGP CAR node.
+   PE and BRs may support color based filtering of CAR routes, to only
+   accept routes of locally configured colors.
 
-5.1.  Illustration
+   RTC [RFC4684] may be applied to the CAR SAFI, where Route Target EC
+   [RFC4360] can be used to constrain distribution of CAR routes.  RT
+   assignment may be via user policy, for example an RT value can be
+   assigned to all routes of a specific color.
+
+5.1.  (E, C) Subscription and Filtering
+
+   This section illustrate an (E, C) BGP subscription model that allows
+   to filter the (E, C) routes learned by a BGP CAR node.
 
         E1-----------------A-------------------B-------------------E2
                                                 <--- (E2, C1) ----
@@ -1245,13 +1264,6 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
 
    *  BGP CAR route (E2, C1) advertised by E2 is not unconditionally
       distributed beyond a certain point (e.g., B)
-
-
-
-Rao, et al.             Expires 27 February 2023               [Page 20]
-
-Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
-
 
    *  E1 subscribes to (E2, C1) by advertising a filter route F (E2, C1)
       to its upstream peer A
@@ -1267,9 +1279,8 @@ Internet-Draft        BGP Color-Aware Routing (CAR)          August 2022
    of receiving a C1-colored service route V/v from E2, for on-demand
    steering via (E2, C1).
 
-5.2.  Definition
-
-   future version of this document
+   On-demand filtering procedures are outside the scope of this
+   document.
 
 6.  Scaling
 
